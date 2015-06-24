@@ -1,0 +1,99 @@
+<style> 
+.map-filter {
+	background-color: #FFF;
+	border: 4px solid #FFF;
+	border-radius: 3px;
+	box-shadow: 0 2px 6px rgba(0,0,0,.3);
+	height: 100%;
+	 
+	margin-top: 35px;
+	width: 200px;
+	
+}
+
+.expand {
+	float: right;
+	width: 10px;
+	margin-top:3px;
+	
+}
+.expand-header {
+	cursor: pointer;
+}
+.expanded {
+	 
+	margin: 0;
+	padding: 10px;	 
+}
+ 
+.custom-range-inactive {
+	color: grainsboro;
+}
+
+.custom-range   input,select  {	 
+	height: 20px;
+	width: 100%; 
+} 
+.custom-range button{
+	background-color: #FF6600;
+	border: none;
+	color: #FFF;
+	margin-top: 10px;
+}
+
+.custom-range-inactive {
+	color: gainsboro !important;
+
+}
+.custom-range-inactive button {
+	background-color: gainsboro !important;
+		
+}
+table.slider-range {
+	width: 100%;	 
+}
+
+table.slider-range tr td span {
+	cursor: pointer;	
+	color: #3a84df;	 
+}
+table.slider-range tr td span:hover {
+	text-decoration: underline;
+}
+
+table.slider-range-inactive span{
+	color:gainsboro !important;
+}
+</style>
+<div class="map-filter"   ng-mouseover="expand=true" ng-mouseleave="expand=false">
+	<div class="expand-header"  >{{data ? data.length : 0}} incidents ({{getDateRangeTitle()}})
+		<img class="expand" src="/images/arrow--down--gray.png"ng-hide="expand"></img>
+		<img class="expand" src="/images/arrow--up--gray.png"  ng-show="expand"></img>
+	</div>
+ 	<div ng-show="expand" class="expanded" >  
+		<table class="slider-range" ng-class="{'slider-range-inactive':rangeMode==2}" ng-click="rangeMode=1">
+			<tr>
+				<td colspan="4" >
+				<input id="dateRange" type="range" min="1" max="4" step="1" ng-model="dateRange"  />
+				</td>		
+			</tr>
+			<tr>
+				<td ng-click="dateRange=1"    style="text-align:left"><span>Today</span></td>
+				<td ng-click="dateRange=2"    style="text-align:left"><span>Week</span></td>
+				<td ng-click="dateRange=3"    style="text-align:center"><span>Month</span></td>
+				<td ng-click="dateRange=4"    style="text-align:right"><span>Year</span></td>
+				 
+			</tr>
+		</table> 
+		 </br>
+		 <div class="custom-range" ng-class="{'custom-range-inactive':rangeMode==1}" ng-click="rangeMode=2" >
+			<div> From:</div>
+			<div class="input"><input  type="date" ng-model="startDate"> </div>
+			<div> To: </div>
+			<div class="input" ><input type="date" ng-model="endDate"> </div>
+			<button ng-click="dateRange=5;rangeChanged()">Update</button> 
+		</div>
+		 
+	</div
+ 
+</div>

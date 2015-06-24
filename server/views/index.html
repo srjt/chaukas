@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html ng-app="chaukas">
+	<head>
+		<title>chaUkas</title>
+		<link rel="stylesheet" type="text/css" href="/lib/bootstrap/dist/css/bootstrap.min.css" />
+		<link rel="stylesheet" type="text/css" href="/css/chaukas.css"/>
+		 <script src="https://maps.googleapis.com/maps/api/js?v=3.exp"></script>
+		<script type="text/javascript" src="/lib/angular/angular.min.js"></script>
+		<script type="text/javascript" src="/lib/angular-route/angular-route.min.js"></script>
+		<script type="text/javascript" src="/js/app.js"></script>
+		<script type="text/javascript" src="/js/factory.js"></script>
+		<script type="text/javascript" src="/js/directive.js"></script>
+		<script type="text/javascript" src="/js/controller.js"></script>
+		<script src="/socket.io/socket.io.js"></script>
+	</head>
+
+	<body>
+		<div class="container-fluid">
+		 
+		</hr>
+		<div class="row-fluid"> 
+			<div class="col-xs-12">
+				<div class='container-fluid navbar navbar-default navbar-fixed-top main-nav'>
+					<div class="row-fluid">
+						<div class="col-xs-4 title">cha<span style="font-size:36px;">u</span>kas </span>
+ 
+						</div>
+
+
+						<div class="col-xs-8">
+
+							<div class="nav-option">
+								<a  href="#/"><img  src='/images/map.png' class="nav-icon" > Map</a>
+							</div>
+							<div class="nav-option">
+								<a  href="#/incidents"><img  src='/images/list.png'  class="nav-icon" > List</a>
+							</div>
+							<div class="nav-option">
+								<a  href="#/raw"><img  src='/images/rawList.png' class="nav-icon" > Raw Data</a>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>	
+		<div class="row-fluid full-height"> 
+			<div class="col-xs-12 content full-height" >
+				<ng-view  ></ng-view>
+			</div>
+		</div>	
+		
+		</div>		 
+	</body>
+
+</html>

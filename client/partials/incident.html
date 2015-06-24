@@ -1,0 +1,15 @@
+<div class='cmnts' style="padding:5px 0" >
+ 	 {{incident._id}}
+ 	 
+ 	<div class="incident">
+ 		<div class="map-image">
+			<sachet-map  data="incidentsOnMap" map-center="incident" map-zoom="15" disable-info="false" add-data-point="addIncidentToMap" remove-data-point="removeIncidentFromMap"></div>
+ 		</div>
+ 		<div class="comments">
+ 			 <div ><a href="#/incidents">List >>  </a>  {{incident.title}}</div>
+ 			<sachet-comments incident="{{incident}}"   max-comments="10" full-page="true"> </sachet-comments>	
+ 		</div>
+ 	<div> 
+			        	
+	 
+</div>

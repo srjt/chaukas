@@ -1,0 +1,35 @@
+Total {{incidents.length}}
+<table class="table" ng-hide="hideList" style="padding:5px 0" >
+		<tr>
+			<th>ID</th>
+			<th>Date</th>
+			<th>Title</th>			
+			<th>Address</th>
+			<th>Lat N Long</th>			
+			<th>Hide from map</th>			
+			 
+		</tr>
+		<tr ng-repeat="data in incidents " style="max-height:250px">
+		<td> 
+			<a  href="#/incidents/{{data._id}}">{{data._id}}</a>
+		</td>
+		<td><span  >{{data.date}}</span></td>
+		<td> 
+		 
+			<a target="_blank" href="{{data.link}}">{{data.title}}</a> 
+		</td>
+		
+		<td> 
+			 
+		  {{data.address}} 
+			 
+ 		</td>
+ 		<td> 
+			 {{data.latitude}},{{data.longitude}}
+		</td>
+		 <td>
+		 	<input type="button" ng-click="addToMap(data)" value="Add to map" ng-hide="data.onMap">  </input>
+		 	<input type="button" ng-click="removeFromMap(data)" value="Remove from map" ng-show="data.onMap">  </input>
+		 </td>
+		</tr>
+	</table>

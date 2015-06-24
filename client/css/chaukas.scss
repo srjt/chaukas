@@ -1,0 +1,54 @@
+
+$navHeight:50px;
+.container-fluid,  html , body {
+	height:100%;
+}
+
+.full-height {
+	height:100%;
+}
+.main-nav {
+	height: $navHeight;
+	background-color: #FF6600;
+ 
+	.nav-option {
+		display:inline-block;
+		float:right;
+		z-index: 1;
+	}
+
+	.nav-icon {
+		width:50px;
+	}
+
+	.title {
+		color:#FFF;
+		font-size:26px;
+		padding-top:5px;
+	}
+	
+	a {
+		font-size:26px;
+	}
+}
+
+.content {
+	margin-top: 50px;
+
+}
+
+.incident {
+	width:100%;
+}
+
+.map-image {
+	 
+	float: left;
+	margin: 10px;
+	width: 40%;	 
+}
+
+.comments {
+	float: right;
+	width: 55%;
+}

@@ -1,0 +1,19 @@
+<div class='incident-info'>
+
+ 	<div style='font-size:8px;font-weight:bold;color:coral' >
+ 	{{incident.date}}	<div style=' float:right'>  {{getCommentsLable()}}  </div>
+ 	</div>
+ 	<div ng-if='incident.comments.length>maxComments' style='text-align:center;'><a href="" ng-click="viewAllComments()">View all comments</a></div>
+	<div class='cmnts' style="max-height:470px;overflow:auto;margin-bottom:10px">
+		<div class='cmnt' style='display:table' ng-repeat='cmnt in incident.comments.latestComments(maxComments) track by $index ' > 
+			<img src='/images/dp.jpg' style='width:40px;height:40px' >
+			 <div style='float:right;padding:3px; '>
+			 	<span style='font-weight:bold' ng-bind='cmnt.username'>  </span>
+			 	<span ng-bind='cmnt.comment' ></span>
+			 	<div style='color:#9197a3' ng-bind='cmnt.date' ></div>
+			</div>
+		</div> 
+	</div>
+	<textarea placeholder='your opinion?' type='text' style='width:100%' ng-model='newComment' chaukas-post-comment='postComment()'> </textarea> 								        	
+	 
+</div>
