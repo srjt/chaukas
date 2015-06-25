@@ -15,11 +15,10 @@ module.exports=function(server){
 		  	});
 
 		  	socket.on('addComment', function (data, fn) {	
-		  	  console.log('adding Comment'); 
+		  	  /*console.log('adding Comment'); 
 		  	  for (var i = 0; i < io.sockets.sockets.length; i++) {
-
 		  	   	console.log(io.sockets.sockets[i].id);
-		  	   }; 
+		  	  }; */
 		      io.sockets.emit('newComment',data);
 		      //socket.broadcast.emit('newIncident', data);
 		      fn(data);		     

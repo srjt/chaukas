@@ -8,8 +8,10 @@
 		bodyParser=require('body-parser'),
 		sassMiddleware = require('node-sass-middleware');
 
+	
+	
 	var routes=require('./routes/chaukasRoutes');
-
+    
 	var app=express();
 
 
@@ -34,8 +36,9 @@
 	}));
 
 	app.use(express.static(path.join(__dirname,'../client')));
-
+	
 	app.use('/',routes);
+	
 
 	app.set('port',process.env.PORT || 3000);
 

@@ -1,24 +1,33 @@
 (function  () {
 	'use strict';
 	var express=require('express'),
-		router=express.Router(),
-		mongojs=require('mongojs'),
-		ObjectId = mongojs.ObjectId,
-		 
-		db=mongojs('chaukasDB',['chaukasCrawledData','chaukasData']);
+		router=express.Router(),		
+		mongoose=require('mongoose'),		
+		Schema = mongoose.Schema,
+   		ObjectId = Schema.ObjectId; 
+		
+
+	mongoose.connect('mongodb://localhost/chaukasDB');
+	var Incident = require('../models/incident.js');
+	var rawIncident = require('../models/rawIncident.js');
+
 	
 	var socketClient = require("socket.io-client");
 	var	socket=socketClient.connect('http://localhost:3000');
-		 
+
+
+  
+
+
 	//GET home page
 	router.get('/',function  (req,res) {
 		res.render('index.html');
 	});
 
 	router.get('/api/rawdata',function  (req,res) {
-		db.chaukasCrawledData.find(function  (err,data) {
-			 res.json(data);
-		});	
+		rawIncident.find(function(err,rawIncidents){
+			res.json(rawIncidents);
+		});		 
 	});
  
  	router.get('/api/incidents',function  (req,res) {
@@ -62,47 +71,39 @@
  					"endDate":endDate,
  					"endDateParse":Date.parse(endDate)
  				});*/
- 				db.chaukasData.find({"date": {"$gte": new Date(startDate), "$lt": new Date(endDate)}}).sort({address:1},function(err,data){
- 					console.log(new Date(startDate));
- 					if(err){
- 						fnErrorResponse(  err);
 
+				Incident.find({"date": {"$gte": new Date(startDate), "$lt": new Date(endDate)}},function(err,incidents){
+					if(err){
+ 						fnErrorResponse(  err);
  					}
  					else {
- 						res.json(data);
+ 						res.json(incidents);
  					}
- 				});
+				});				
  				
  			}
  		}
  		else { 
-			db.chaukasData.find( ).sort({address:1},function  (err,data) {
-				 res.json(data);
-			});	
+ 			Incident.find().sort({address:1}).exec(function(err,incidents){
+ 				 res.json(incidents);
+ 			});			
 		}
 	});
 
  	router.get('/api/incidents/:id',function  (req,res) {
-		db.chaukasData.findOne({
-			_id:ObjectId(req.params.id)
-		} ,function  (err,data) {
-			if(err){res.json(err)}
-			else{res.json(data);}
-		});	
+ 		Incident.findOne({_id:req.params.id},function(err,incident){ 			 
+ 			if(err){res.json(err);}
+ 			else{res.json(incident);}
+ 		}); 		
 	});
 
-	router.post('/api/incidents/:id',function   (req,res,next) {
-		//res.json(req.params);
-		db.chaukasData.findOne({
-			_id:ObjectId(req.params.id)
-		},function  (err,data) {
-			
-			if(data){ 
-				var updIncident={};
-				for(var n in data){
-					updIncident[n]=data[n];	
-				}
+	router.post('/api/incidents/:id',function   (req,res,next) {		
+		Incident.findOne({_id:req.params.id},function(err, incident){
+			if(incident){
 				
+				var updIncident={}
+			 
+				updIncident.comments=incident.comments;
 				var newComment=req.body;
 				newComment.date=getCurrentUTCDateNTime(); 
 				if(updIncident.comments==undefined){
@@ -110,23 +111,40 @@
 				}
 				updIncident['comments'].push(newComment);
 
+ 
+				
 				//socket.emit('addComment',{'incident':req.params.id,'comment':newComment},function(data){});
 				//res.json(updIncident);
 
-				db.chaukasData.update({
-					_id:ObjectId(req.params.id)
-				},updIncident,{
-					multi:false
-				},function  (err,data) {
-					res.writeHead(200,{
-						'Content-Type':'application/json; charset=utf-8'
-					});
-					socket.emit('addComment',{'incident':req.params.id,'comment':newComment},function(data){});
-					res.end(JSON.stringify(data));
-				});
+				Incident.update({_id:req.params.id},
+					{comments:updIncident.comments},
+					{multi:false},
+					function(err, updatedIncident) {
+						console.log(err);
+						if(err){res.json(err);}
+						else{
+							res.writeHead(200,{
+								'Content-Type':'application/json; charset=utf-8'
+							});
+							
+							socket.emit('addComment',{'incident':req.params.id,'comment':newComment},function(data){});
+							res.end(JSON.stringify(updatedIncident));
+						}
+				});				
 			}
-		});		 
+		});		 		 
 	});
+
+
+	 
+
+
+	router.post('/api/auth/facebook',function(req,res,next){
+		console.log(req.body);
+		res.json(req.body);
+	});
+
+
 
 	function getCurrentUTCDateNTime(){
 		return new Date().toISOString().
