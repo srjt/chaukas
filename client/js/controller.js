@@ -1,3 +1,8 @@
+chaukas.controller('loginCtrl',['$scope','$auth',function($scope,$auth){
+	 $scope.authenticate = function(provider) {
+      $auth.authenticate(provider);
+    };
+}]);
 chaukas.controller('rawDataCtrl',['$rootScope','$scope','rawDataFactory',function  ($rootScope,$scope,rawDataFactory) {
 	$scope.rawData=[]; 
 	rawDataFactory.getRawDataAll().then(function  (data) {

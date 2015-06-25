@@ -73,6 +73,7 @@ chaukas.factory('incidentsFactory',['$http','$q','chaukasAuth',function($http,$q
 chaukas.factory('chaukasSocket', ['$rootScope',function ($rootScope) {
 	var socket = io.connect();
   	return {
+  		
     	on: function (eventName, callback) {
     			var wrapCallback=function(){  
 		        	var args = arguments;
