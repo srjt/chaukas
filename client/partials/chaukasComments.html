@@ -6,9 +6,9 @@
  	<div ng-if='incident.comments.length>maxComments' style='text-align:center;'><a href="" ng-click="viewAllComments()">View all comments</a></div>
 	<div class='cmnts' style="max-height:470px;overflow:auto;margin-bottom:10px">
 		<div class='cmnt' style='display:table' ng-repeat='cmnt in incident.comments.latestComments(maxComments) track by $index ' > 
-			<img src='/images/dp.jpg' style='width:40px;height:40px' >
+			<img ng-src='{{cmnt.user.picture}}' style='width:40px;height:40px' >
 			 <div style='float:right;padding:3px; '>
-			 	<span style='font-weight:bold' ng-bind='cmnt.username'>  </span>
+			 	<span style='font-weight:bold' ng-bind='cmnt.user.displayName'>  </span>
 			 	<span ng-bind='cmnt.comment' ></span>
 			 	<div style='color:#9197a3' ng-bind='cmnt.date' ></div>
 			</div>

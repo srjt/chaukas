@@ -1,6 +1,27 @@
 <div class="container">
-
-    <div class="center-form panel">
+<style>
+body {
+  background-image:url('../images/delhi1.jpg');
+  background-position: center;
+  background-attachment: fixed;
+  background-size: cover;
+  margin:0;
+  padding:0;
+  overflow:hidden;
+}
+.center-form{
+  width: 350px;  
+  margin-top: 100px;
+}
+.signup-or-separator {
+  text-align: center;
+}
+.btn-login{
+  background-color: #FF6600;
+  color: #FFF;
+}
+</style>
+    <div class="center-form panel"  >
       <div class="panel-body">
         <h4 class="text-center"><i class="ion-log-in"></i> Log in</h4>
 
@@ -23,7 +44,7 @@
             </div>
           </div>
 
-          <button type="submit" class="btn btn-block btn-success" ng-disabled="loginForm.$invalid">Log in</button>
+          <button type="submit" class="btn btn-block btn-login" ng-disabled="loginForm.$invalid">Log in</button>
 
           <br/>
 
@@ -33,11 +54,17 @@
 
           <div class="signup-or-separator">
             <h6 class="text">or</h6>
-            <hr>
+            
           </div>
         </form>
-        <button class="btn btn-block"  ng-click="authenticate('facebook')">Sign in with Facebook</button>
-         
+        
+        <a class="btn btn-block btn-social btn-facebook"  ng-click="authenticate('facebook')">
+          <i class="fa fa-facebook"></i>
+
+          Sign in with Facebook</a>
+
+
+        
       </div>
     </div>
 

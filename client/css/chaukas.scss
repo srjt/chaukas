@@ -1,5 +1,11 @@
 
 $navHeight:50px;
+
+body {
+	background-color:#FAF0DC;	
+}
+
+
 .container-fluid,  html , body {
 	height:100%;
 }
@@ -10,25 +16,38 @@ $navHeight:50px;
 .main-nav {
 	height: $navHeight;
 	background-color: #FF6600;
- 
+  
+
 	.nav-option {
 		display:inline-block;
 		float:right;
+		padding:0 10px;
+		margin:5px;
 		z-index: 1;
-	}
+	}	 
 
-	.nav-icon {
-		width:50px;
-	}
+	.nav-option:hover {
+		background-color:#E5630D;
+	}	
 
 	.title {
 		color:#FFF;
-		font-size:26px;
-		padding-top:5px;
+		font-size:26px;		
 	}
 	
 	a {
 		font-size:26px;
+		i {
+			color:#337ab7;
+		}
+	}
+
+	a:hover ,a:focus, .selected{
+		color:#FFF;
+		text-decoration:none;
+		 i {
+		 	color:#FFF;
+		 }
 	}
 }
 

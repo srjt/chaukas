@@ -1,10 +1,19 @@
-chaukas.factory('chaukasAuth',function(){
+chaukas.factory('chaukasAuth',['$window','$auth',function($window,$auth){
 	var _chaukasAuthentication={};
-	_chaukasAuthentication.loggedUser=function(){
-		return 'srjt';
+	_chaukasAuthentication={
+		loggedUser:function(){
+			if(this.user){
+				return this.user.displayName;
+			}
+		},
+		user:undefined,
+		isLogged:function(){
+			return $auth.isAuthenticated() && this.user!=undefined;
+		}
 	};
+	 
 	return _chaukasAuthentication;
-});
+}]);
 chaukas.factory('rawDataFactory',['$http', function($http) {
 	var urlBase = '/api/rawdata';
 	var _rawDataService = {};
@@ -64,7 +73,7 @@ chaukas.factory('incidentsFactory',['$http','$q','chaukasAuth',function($http,$q
 			deferred.reject(errMsg);
 		};
 
-		$http.post(urlBase+'incidents/' + incidentId,{"username":chaukasAuth.loggedUser(),"comment":comment }).success(success).error(error);
+		$http.post(urlBase+'incidents/' + incidentId,{"user":chaukasAuth.user,"comment":comment }).success(success).error(error);
 		return deferred.promise;
 
 	}

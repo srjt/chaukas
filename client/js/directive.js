@@ -230,7 +230,7 @@ chaukas.directive('chaukasMap',['$window','$document','$compile','incidentsFacto
 		}
 	}	 
 }]);
-chaukas.directive('chaukasComments',['$location','incidentsFactory','chaukasSocket',function($location,incidentsFactory,chaukasSocket){
+chaukas.directive('chaukasComments',['$location','incidentsFactory','chaukasSocket','chaukasAuth',function($location,incidentsFactory,chaukasSocket,chaukasAuth){
 	return {
 		 
 		replate:true,
@@ -264,7 +264,12 @@ chaukas.directive('chaukasComments',['$location','incidentsFactory','chaukasSock
 				});	
 			}
 			
-
+			scope.getDp=function(){
+				if(chaukasAuth.user)
+				{
+					return chaukasAuth.user.picture;
+				}
+			};
 			scope.viewAllComments=function(){
 				if(!attr.fullPage){ 
 					$location.path('/incidents/' + scope.incident._id);

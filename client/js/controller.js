@@ -1,9 +1,38 @@
-chaukas.controller('loginCtrl',['$scope','$auth',function($scope,$auth){
-	 $scope.authenticate = function(provider) {
-      $auth.authenticate(provider);
-    };
+chaukas.controller('navigationCtrl',['$scope','$auth','$location','chaukasAuth',function($scope,$auth,$location,chaukasAuth){
+
+	
+	function setSelctedNav(){
+
+		if($location.$$path.indexOf('map')>=0){
+			$scope.selectedNav='map';
+		}
+		else if($location.$$path.indexOf('incidents')>=0){
+			$scope.selectedNav='list';
+		}
+		if($location.$$path.indexOf('raw')>=0){
+			$scope.selectedNav='rlist';
+		}
+	}
+	$scope.chaukasAuth=chaukasAuth;	
+	$scope.signOut=function(){
+		$auth.logout().then(function(){
+		});
+	};
+	setSelctedNav();
 }]);
-chaukas.controller('rawDataCtrl',['$rootScope','$scope','rawDataFactory',function  ($rootScope,$scope,rawDataFactory) {
+chaukas.controller('loginCtrl',['$scope','$auth','$location','chaukasAuth',function($scope,$auth,$location,chaukasAuth){
+
+	if(chaukasAuth.isLogged()){
+		$location.path('/map');
+	}
+	$scope.authenticate = function(provider) {
+    	$auth.authenticate(provider).then(function(data){
+      		chaukasAuth.user=data.data.user;      		 
+      });
+    };
+    
+}]);
+chaukas.controller('rawDataCtrl',[ '$scope','rawDataFactory',function  ($scope,rawDataFactory) {
 	$scope.rawData=[]; 
 	rawDataFactory.getRawDataAll().then(function  (data) {
 		$scope.rawData=data.data;
@@ -12,8 +41,7 @@ chaukas.controller('rawDataCtrl',['$rootScope','$scope','rawDataFactory',functio
 chaukas.controller('chaukasMapCtrl',['$scope','incidentsFactory','chaukasSocket',function($scope,incidentsFactory,chaukasSocket){
 	//$scope.incidents=[];
 	$scope.incidentsOnMap=[];
-	$scope.currentCity={"name":"delhi","position":{"latitude":"28.666667","longitude":"77.216667"}}
-	
+	$scope.currentCity={"name":"delhi","position":{"latitude":"28.666667","longitude":"77.216667"}}	
 
 
  	chaukasSocket.on('newIncident', function (data) {
@@ -91,11 +119,10 @@ chaukas.controller('chaukasListCtrl',['$scope','incidentsFactory','chaukasSocket
 }]);
 
 chaukas.controller('incidentCtrl',['$scope','$routeParams','incidentsFactory','chaukasSocket',function($scope,$routeParams,incidentsFactory,chaukasSocket){
-
 	 
 	incidentsFactory.getIncidentById($routeParams._id).then(function(data){
 		$scope.incident=data.data;
-		 $scope.addIncidentToMap($scope.incident);	
+	// $scope.addIncidentToMap($scope.incident);	
 	},function(errMsg){
 		console.log(errMsg);
 	});	

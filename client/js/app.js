@@ -10,7 +10,16 @@ var chaukas	=angular.module('chaukas',['ngRoute','satellizer'])
 		})
 		.when('/map',{
 			templateUrl:'/partials/chaukasMap.html',
-			controller:'chaukasMapCtrl'
+			controller:'chaukasMapCtrl',
+			resolve:{
+				auth: ['$q', 'chaukasAuth', function( $q, chaukasAuth) {
+			      var userInfo = chaukasAuth.isLogged();
+			 
+			      if (!chaukasAuth.isLogged()) {
+			        return $q.reject({ authenticated: false });
+			      }  
+			    }]
+			}
 		})
 		.when('/incidents',{
 			templateUrl:'/partials/incidents.html',
@@ -31,7 +40,7 @@ var chaukas	=angular.module('chaukas',['ngRoute','satellizer'])
 		  name:'facebook',
 		  url: '/api/auth/facebook',
 		  authorizationEndpoint: 'https://www.facebook.com/v2.3/dialog/oauth',
-		  redirectUri: window.location.origin || window.location.protocol + '//' + window.location.host + '/',
+		  redirectUri: window.location.origin + '/' || window.location.protocol + '//' + window.location.host + '/',
 		  scope: 'email',
 		  scopeDelimiter: ',',
 		  requiredUrlParams: ['display', 'scope'],
@@ -40,3 +49,10 @@ var chaukas	=angular.module('chaukas',['ngRoute','satellizer'])
 		  popupOptions: { width: 481, height: 269 }   
 		}); 
 });
+chaukas.run(["$rootScope", "$location", function($rootScope, $location) { 
+  $rootScope.$on("$routeChangeError", function(event, current, previous, eventObj) {
+    if (eventObj.authenticated === false) {
+      $location.path("/login");
+    }
+  });
+}]);
