@@ -6,10 +6,10 @@
 		  
 		<input type="button" ng-click="addAllToMap()" value="Add all to Map" />
 		<input type="button" ng-click="removeAllFromMap()" value="Remove all from Map" />
-		<span   >{{incidentsOnMap.length}}</span>  
+		<span>{{incidentsOnMap.length}}</span>  
 		<input type='button' ng-click="addTestData()" value="Add Test Data" />
 	</div>
-	<chaukas-map  data="incidentsOnMap" current-city="currentCity"  add-data-point="addIncidentToMap" map-center="currentCity.position" remove-data-point="removeIncidentFromMap" ></chaukas-map>
+	<chaukas-map  enable-filter-control="true"  data="incidentsOnMap" current-city="currentCity"  add-data-point="addIncidentToMap" map-center="currentCity.position" remove-data-point="removeIncidentFromMap" ></chaukas-map>
 
 </div>
  

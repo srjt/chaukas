@@ -25,9 +25,10 @@ chaukas.factory('rawDataFactory',['$http', function($http) {
 chaukas.factory('incidentsFactory',['$http','$q','chaukasAuth',function($http,$q,chaukasAuth){
 	var urlBase='/api/';
 	var _incidentDataService={};
-	_incidentDataService.getIncidents=function(dateRange,startDate,endDate){
+	_incidentDataService.getIncidents=function(startDate,endDate){
 		var deferred = $q.defer();   
-   		
+   		console.log(startDate);
+   		console.log(endDate);
    		var success=function(data){
   			deferred.resolve(data);   			
    		};
@@ -35,10 +36,15 @@ chaukas.factory('incidentsFactory',['$http','$q','chaukasAuth',function($http,$q
    		var error=function(errMsg){
    			deferred.reject(errMsg);
    		}
-   		
-   		if(dateRange){   		 
+		if(startDate && endDate){
+			$http.get(urlBase +  'incidents?filter=' + startDate.toISOString() + ',' + endDate.toISOString()   ).then(success,error);
+		}   			
+		else{ 
+			$http.get(urlBase +   'incidents'  ).then(success,error);
+		}
+   		/*if(dateRange){   		 
    			if(startDate && endDate){
-   				$http.get(urlBase +  'incidents?' + startDate + ',' + endDate   ).then(success,error);
+   				$http.get(urlBase +  'incidents?filter=' + startDate + ',' + endDate   ).then(success,error);
    			}   			
    			else{ 
 	   			var	filter='?filter=' + dateRange;
@@ -46,7 +52,7 @@ chaukas.factory('incidentsFactory',['$http','$q','chaukasAuth',function($http,$q
    			}
    		} else { 
 			$http.get(urlBase +   'incidents'  ).then(success,error);
-		}
+		}*/
 		return deferred.promise;
 	},
 	_incidentDataService.getIncidentById=function(id){
@@ -108,3 +114,12 @@ chaukas.factory('chaukasSocket', ['$rootScope',function ($rootScope) {
     	}
   };
 }]);
+chaukas.factory('chaukasUtils',[function(){
+	return {
+		//TODO: this should be based on location of map
+		dateTimeFormat: 'MMM DD, YYYY HH:mm:ss A',		 
+		currentTimezone:'Asia/Calcutta',
+		currentCity:{"name":"delhi","position":{"latitude":"28.666667","longitude":"77.216667"}}	
+		//-------
+	};
+}])

@@ -1,19 +1,40 @@
 <div class='incident-info'>
-
- 	<div style='font-size:8px;font-weight:bold;color:coral' >
- 	{{incident.date}}	<div style=' float:right'>  {{getCommentsLable()}}  </div>
+<style>
+.no-pic {
+	height: 40px;
+	width: 40px;
+	font-size: 26px;
+	border-radius: 50%;
+	border: 1px solid #FF6600;
+	text-align: center;
+	background-color: #FF6600; 
+	float: left;
+	margin:5px 10px 5px 0px ;
+	color: #FFF;
+}
+</style>
+ 	<div style='font-size:10px;font-weight:bold;color:coral' > 	
+ 	{{getLocalizedDate(incident.date)}}-- {{incident.date}}
+ 	
+ 	<div style=' float:right'>  {{getCommentsLable()}}  </div> 	
  	</div>
  	<div ng-if='incident.comments.length>maxComments' style='text-align:center;'><a href="" ng-click="viewAllComments()">View all comments</a></div>
 	<div class='cmnts' style="max-height:470px;overflow:auto;margin-bottom:10px">
-		<div class='cmnt' style='display:table' ng-repeat='cmnt in incident.comments.latestComments(maxComments) track by $index ' > 
-			<img ng-src='{{cmnt.user.picture}}' style='width:40px;height:40px' >
-			 <div style='float:right;padding:3px; '>
+		<div class='cmnt' style='display:table;width:100%;background-color:#D9D6D6;padding:0 5px;margin:2px 0;' ng-repeat='cmnt in incident.comments.latestComments(maxComments) track by $index ' > 
+			<img ng-show="cmnt.user.picture" ng-src='{{cmnt.user.picture}}' style='width:40px;height:40px;border-radius:50%;margin:5px 10px 5px 0px ;float:left;' >
+			
+			<span ng-hide="cmnt.user.picture" class="no-pic">{{cmnt.user.displayName.substr(0,1)}}</span>
+			 
+			 <div style='margin:5px 0;'>
 			 	<span style='font-weight:bold' ng-bind='cmnt.user.displayName'>  </span>
 			 	<span ng-bind='cmnt.comment' ></span>
-			 	<div style='color:#9197a3' ng-bind='cmnt.date' ></div>
+			 	<div style='display:block;color:#9197a3;font-size:10px;font-weight:bold'  > <!-- ng-bind='getLocalizedDate(cmnt.date)' > -->
+ 					<!-- <time   am-time-ago="getLocalizedDate(cmnt.date)" am-format="{{getDateTimeFormat()}}"></time> --> {{getLocalizedDate(cmnt.date)}} -- {{cmnt.date}}
+			 	</div>
+			 	
 			</div>
 		</div> 
 	</div>
-	<textarea placeholder='your opinion?' type='text' style='width:100%' ng-model='newComment' chaukas-post-comment='postComment()'> </textarea> 								        	
+	<textarea placeholder='your opinion?' type='text' style='width:100%;resize:none;' ng-model='newComment' chaukas-post-comment='postComment()'> </textarea> 								        	
 	 
 </div>

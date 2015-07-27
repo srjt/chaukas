@@ -1,8 +1,5 @@
-chaukas.controller('navigationCtrl',['$scope','$auth','$location','chaukasAuth',function($scope,$auth,$location,chaukasAuth){
-
-	
+chaukas.controller('navigationCtrl',['$scope','$auth','$location','chaukasAuth',function($scope,$auth,$location,chaukasAuth){	
 	function setSelctedNav(){
-
 		if($location.$$path.indexOf('map')>=0){
 			$scope.selectedNav='map';
 		}
@@ -15,22 +12,60 @@ chaukas.controller('navigationCtrl',['$scope','$auth','$location','chaukasAuth',
 	}
 	$scope.chaukasAuth=chaukasAuth;	
 	$scope.signOut=function(){
-		$auth.logout().then(function(){
+		$auth.logout()
+		.then(function(){
 		});
 	};
 	setSelctedNav();
 }]);
 chaukas.controller('loginCtrl',['$scope','$auth','$location','chaukasAuth',function($scope,$auth,$location,chaukasAuth){
-
 	if(chaukasAuth.isLogged()){
 		$location.path('/map');
 	}
+	$scope.emailLogin = function() {
+      $auth.login({ email: $scope.email, password: $scope.password })
+        .then(function(data) {
+          	chaukasAuth.user=data.data.user;      		
+      		$location.path('/map');
+        })
+        .catch(function(err) {
+           $scope.errorLogin=err.data.message;
+        });
+    };
 	$scope.authenticate = function(provider) {
-    	$auth.authenticate(provider).then(function(data){
-      		chaukasAuth.user=data.data.user;      		 
-      });
+    	$auth.authenticate(provider)
+    	.then(function(data){
+      		chaukasAuth.user=data.data.user;      		
+      		$location.path('/map');
+      	})
+    	.catch(function(err){
+			$scope.errorFb=err.data.error;	
+		});
     };
     
+}]);
+chaukas.controller('signupCtrl',['$scope','$auth','$location','chaukasAuth',function($scope,$auth,$location	,chaukasAuth){
+
+    $scope.signup = function() {
+		$auth.signup({
+			displayName: $scope.displayName,
+			email: $scope.email,
+			password: $scope.password
+		})
+		.then(function(data){
+			chaukasAuth.user=data.data.user;      		
+			$location.path('/map');
+		})
+		.catch(function(response) {
+			if (typeof response.data.message === 'object') {
+			  angular.forEach(response.data.message, function(message) {
+			    errorSignup += ' '  + message[0];
+			  });
+			} else {          
+			   errorSignup= response.data.message;         
+			}
+		});
+    };
 }]);
 chaukas.controller('rawDataCtrl',[ '$scope','rawDataFactory',function  ($scope,rawDataFactory) {
 	$scope.rawData=[]; 
@@ -38,10 +73,10 @@ chaukas.controller('rawDataCtrl',[ '$scope','rawDataFactory',function  ($scope,r
 		$scope.rawData=data.data;
 	});	 
 }]);
-chaukas.controller('chaukasMapCtrl',['$scope','incidentsFactory','chaukasSocket',function($scope,incidentsFactory,chaukasSocket){
+chaukas.controller('chaukasMapCtrl',['$scope','incidentsFactory','chaukasSocket','chaukasUtils',function($scope,incidentsFactory,chaukasSocket,chaukasUtils){
 	//$scope.incidents=[];
 	$scope.incidentsOnMap=[];
-	$scope.currentCity={"name":"delhi","position":{"latitude":"28.666667","longitude":"77.216667"}}	
+	$scope.currentCity=chaukasUtils.currentCity;
 
 
  	chaukasSocket.on('newIncident', function (data) {
@@ -118,11 +153,12 @@ chaukas.controller('chaukasListCtrl',['$scope','incidentsFactory','chaukasSocket
 	}) ;
 }]);
 
-chaukas.controller('incidentCtrl',['$scope','$routeParams','incidentsFactory','chaukasSocket',function($scope,$routeParams,incidentsFactory,chaukasSocket){
+chaukas.controller('incidentCtrl',['$scope','$routeParams','incidentsFactory','chaukasSocket','chaukasUtils',function($scope,$routeParams,incidentsFactory,chaukasSocket,chaukasUtils){
 	 
+	$scope.currentCity= chaukasUtils.currentCity;
 	incidentsFactory.getIncidentById($routeParams._id).then(function(data){
 		$scope.incident=data.data;
-	// $scope.addIncidentToMap($scope.incident);	
+		$scope.addIncidentToMap($scope.incident);	
 	},function(errMsg){
 		console.log(errMsg);
 	});	

@@ -6,7 +6,7 @@ Total {{incidents.length}}
 			<th>Title</th>			
 			<th>Address</th>
 			<th>Lat N Long</th>			
-			<th>Hide from map</th>			
+			 			
 			 
 		</tr>
 		<tr ng-repeat="data in incidents " style="max-height:250px">
@@ -27,9 +27,6 @@ Total {{incidents.length}}
  		<td> 
 			 {{data.latitude}},{{data.longitude}}
 		</td>
-		 <td>
-		 	<input type="button" ng-click="addToMap(data)" value="Add to map" ng-hide="data.onMap">  </input>
-		 	<input type="button" ng-click="removeFromMap(data)" value="Remove from map" ng-show="data.onMap">  </input>
-		 </td>
+		  
 		</tr>
 	</table>

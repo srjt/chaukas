@@ -5,9 +5,41 @@ body {
 	background-color:#FAF0DC;	
 }
 
+.logo {
+	border: 3px solid #FFF;
+	font-size: 22px;
+	border-radius: 50%;
+	height: 32px;
+	width: 32px;
+	display: inline-block;
+	text-align: center;
+	position:relative;
+
+	.eye {
+		color:black;
+		font-size:8px;
+		position:absolute;
+		top:3px;		 	
+	}
+	.left-eye{ 
+		left:4.5px;
+	}
+ 
+	.right-eye{ 
+		right:4.5px;
+	}	
+	 	
+}
+
 
 .container-fluid,  html , body {
 	height:100%;
+}
+body {
+	overflow:hidden;
+}
+.container-fluid {
+	overflow:auto;
 }
 
 .full-height {
@@ -16,13 +48,12 @@ body {
 .main-nav {
 	height: $navHeight;
 	background-color: #FF6600;
-  
+  	overflow:visible;
 
 	.nav-option {
 		display:inline-block;
 		float:right;
-		padding:0 10px;
-		margin:5px;
+		padding:5px 10px;		
 		z-index: 1;
 	}	 
 
@@ -32,7 +63,9 @@ body {
 
 	.title {
 		color:#FFF;
-		font-size:26px;		
+		padding-top:15px;
+
+
 	}
 	
 	a {

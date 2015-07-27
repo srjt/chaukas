@@ -11,7 +11,8 @@ chaukas.directive('chaukasMap',['$window','$document','$compile','incidentsFacto
 			mapCenter:'=',
 			mapZoom:'=',
 			disableInfo:'@',
-			currentCity:'='
+			currentCity:'=',
+			enableFilterControl:'='
 		},
 		link:function(scope,element){
 			var map;
@@ -20,55 +21,60 @@ chaukas.directive('chaukasMap',['$window','$document','$compile','incidentsFacto
 			function initialize(){
 			  	var mapOptions = {
 			    	zoom: 11,
-			    	center: new google.maps.LatLng(scope.currentCity.latitude, scope.currentCity.longitude),
+			    	//center: (scope.currentCity) ? new google.maps.LatLng(scope.currentCity.latitude, scope.currentCity.longitude): undefined,
 			    	mapTypeId: google.maps.MapTypeId.ROADMAP
 			    
 			  	};
 			  	map = new google.maps.Map(element[0],mapOptions);		 
 			  
-				var filterControl = document.createElement('div');
-				var attFilterControl = document.createAttribute("filter-control"); 
-				filterControl.setAttributeNode(attFilterControl);
-				
-				var attData=document.createAttribute('data');
-				attData.value='data';
-				filterControl.setAttributeNode(attData);
-	
-				var attDateRange=document.createAttribute('date-range');
-				attDateRange.value='initDateRange';
-				filterControl.setAttributeNode(attDateRange);
+
+				if(scope.enableFilterControl) {
+					var filterControl = document.createElement('div');
+					var attFilterControl = document.createAttribute("filter-control"); 
+					filterControl.setAttributeNode(attFilterControl);
+					
+					var attData=document.createAttribute('data');
+					attData.value='data';
+					filterControl.setAttributeNode(attData);
+		
+					var attDateRange=document.createAttribute('date-range');
+					attDateRange.value='initDateRange';
+					filterControl.setAttributeNode(attDateRange);
 
 
-				scope.fnDateRangeChanged=function(dateRange,startDate,endDate){
-					if(dateRange!='custom'){
-						incidentsFactory.getIncidents(dateRange).then(function(data){
-							scope.data=data.data;	
-							if((!scope.data || scope.data.length<=0) && scope.initDateRange<4){
-								scope.initDateRange++;
-							}					 
-						},function(errMsg){
-							console.log(errMsg);
-						}) ;
-					}
-					else {
-						incidentsFactory.getIncidents(dateRange,startDate,endDate).then(function(data){
-							scope.data=data.data;	
-							 					 
-						},function(errMsg){
-							console.log(errMsg);
-						}) ;	
-					}
-					 
-				};
-				var attDateRangeChanged=document.createAttribute('date-range-changed');
-				attDateRangeChanged.value='fnDateRangeChanged(dateRange,startDate,endDate)';
-				filterControl.setAttributeNode(attDateRangeChanged);
-	  
-				filterControl.index = 1;
 
-				filterScope=scope.$new();        	 
-	        	var compiledFilterControl=$compile(filterControl)(filterScope)
-				map.controls[google.maps.ControlPosition.TOP_LEFT].push(compiledFilterControl[0]);
+					scope.fnDateRangeChanged=function(dateRange,startDate,endDate){ 
+
+						if(dateRange!='custom'){
+							incidentsFactory.getIncidents(startDate,endDate).then(function(data){
+								scope.data=data.data;	
+								if((!scope.data || scope.data.length<=0) && scope.initDateRange<4){
+									scope.initDateRange++;
+								}					 
+							},function(errMsg){
+								console.log(errMsg);
+							}) ;
+						}
+						else {
+							incidentsFactory.getIncidents(startDate,endDate).then(function(data){
+								scope.data=data.data;	
+								 					 
+							},function(errMsg){
+								console.log(errMsg);
+							}) ;	
+						}
+						 
+					};
+					var attDateRangeChanged=document.createAttribute('date-range-changed');
+					attDateRangeChanged.value='fnDateRangeChanged(dateRange,startDate,endDate)';
+					filterControl.setAttributeNode(attDateRangeChanged);
+		  
+					filterControl.index = 1;
+
+					filterScope=scope.$new();        	 
+		        	var compiledFilterControl=$compile(filterControl)(filterScope)
+					map.controls[google.maps.ControlPosition.TOP_LEFT].push(compiledFilterControl[0]);
+				}
 			}
 			
 		 
@@ -230,7 +236,7 @@ chaukas.directive('chaukasMap',['$window','$document','$compile','incidentsFacto
 		}
 	}	 
 }]);
-chaukas.directive('chaukasComments',['$location','incidentsFactory','chaukasSocket','chaukasAuth',function($location,incidentsFactory,chaukasSocket,chaukasAuth){
+chaukas.directive('chaukasComments',['$location','amMoment','incidentsFactory','chaukasSocket','chaukasAuth','chaukasUtils',function($location,amMoment,incidentsFactory,chaukasSocket,chaukasAuth,chaukasUtils){
 	return {
 		 
 		replate:true,
@@ -307,7 +313,12 @@ chaukas.directive('chaukasComments',['$location','incidentsFactory','chaukasSock
 				}
 				return '';
 			}
-
+			scope.getLocalizedDate=function(dt){			    
+			    return amMoment.applyTimezone(moment.utc(dt ), chaukasUtils.currentTimezone).format(chaukasUtils.dateTimeFormat);    			
+			};
+			scope.getDateTimeFormat=function(){
+				return chaukasUtils.dateTimeFormat;	
+			};
 			Array.prototype.latestComments=function(num){
 				var newArray=[]
 				if(this.length>=num){ 
@@ -386,7 +397,7 @@ chaukas.directive('filterControl',function(){
 					case 1:
 						dateRangeText='today';
 						scope.startDate=new Date();
-						scope.endDate=getTomorrowDate();
+						scope.endDate=new Date();
 						break;
 					case 2:
 						dateRangeText='week';
@@ -405,8 +416,17 @@ chaukas.directive('filterControl',function(){
 						break;
 					default:
 						dateRangeText='custom';
+						/*var tempDate=new Date(scope.startDate);
+						var mnth=tempDate.getMonth() + 1;
+						scope.startDate=new Date(tempDate.getFullYear()+'-'+ mnth +'-'+tempDate.getDate());
+						tempDate=new Date(scope.endDate);
+						var mnth=tempDate.getMonth() + 1;
+						scope.endDate=new Date(tempDate.getFullYear()+'-'+ mnth +'-'+tempDate.getDate());*/
 						break;
-				}				 
+				}			
+				//set Hours to include whole days
+				scope.startDate.setHours(0,0,0,0)	 ;
+				scope.endDate.setHours(23,59,59,59);
 				scope.dateRangeChanged({dateRange:dateRangeText,startDate:scope.startDate,endDate:scope.endDate});
 				 
 			}
@@ -426,3 +446,134 @@ chaukas.directive('filterControl',function(){
 		}
 	};
 });
+chaukas.directive('passwordMatch', function() {
+    return {
+      require: 'ngModel',
+      scope: {
+        otherModelValue: '=passwordMatch'
+      },
+      link: function(scope, element, attributes, ngModel) {
+        ngModel.$validators.compareTo = function(modelValue) {
+          return modelValue === scope.otherModelValue;
+        };
+        scope.$watch('otherModelValue', function() {
+          ngModel.$validate();
+        });
+      }
+    };
+  });
+chaukas.directive('passwordStrength', function() {
+    return {
+      restrict: 'A',
+      require: 'ngModel',
+      link: function(scope, element, attrs, ngModel) {
+        var indicator = element.children();
+        var dots = Array.prototype.slice.call(indicator.children());
+        var weakest = dots.slice(-1)[0];
+        var weak = dots.slice(-2);
+        var strong = dots.slice(-3);
+        var strongest = dots.slice(-4);
+
+        element.after(indicator);
+
+        element.bind('keyup', function() {
+          var matches = {
+                positive: {},
+                negative: {}
+              },
+              counts = {
+                positive: {},
+                negative: {}
+              },
+              tmp,
+              strength = 0,
+              letters = 'abcdefghijklmnopqrstuvwxyz',
+              numbers = '01234567890',
+              symbols = '\\!@#$%&/()=?¿',
+              strValue;
+
+          angular.forEach(dots, function(el) {
+            el.style.backgroundColor = '#ebeef1';
+          });
+          
+          if (ngModel.$viewValue) {
+            // Increase strength level
+            matches.positive.lower = ngModel.$viewValue.match(/[a-z]/g);
+            matches.positive.upper = ngModel.$viewValue.match(/[A-Z]/g);
+            matches.positive.numbers = ngModel.$viewValue.match(/\d/g);
+            matches.positive.symbols = ngModel.$viewValue.match(/[$-/:-?{-~!^_`\[\]]/g);
+            matches.positive.middleNumber = ngModel.$viewValue.slice(1, -1).match(/\d/g);
+            matches.positive.middleSymbol = ngModel.$viewValue.slice(1, -1).match(/[$-/:-?{-~!^_`\[\]]/g);
+
+            counts.positive.lower = matches.positive.lower ? matches.positive.lower.length : 0;
+            counts.positive.upper = matches.positive.upper ? matches.positive.upper.length : 0;
+            counts.positive.numbers = matches.positive.numbers ? matches.positive.numbers.length : 0;
+            counts.positive.symbols = matches.positive.symbols ? matches.positive.symbols.length : 0;
+
+            counts.positive.numChars = ngModel.$viewValue.length;
+            tmp += (counts.positive.numChars >= 8) ? 1 : 0;
+
+            counts.positive.requirements = (tmp >= 3) ? tmp : 0;
+            counts.positive.middleNumber = matches.positive.middleNumber ? matches.positive.middleNumber.length : 0;
+            counts.positive.middleSymbol = matches.positive.middleSymbol ? matches.positive.middleSymbol.length : 0;
+
+            // Decrease strength level
+            matches.negative.consecLower = ngModel.$viewValue.match(/(?=([a-z]{2}))/g);
+            matches.negative.consecUpper = ngModel.$viewValue.match(/(?=([A-Z]{2}))/g);
+            matches.negative.consecNumbers = ngModel.$viewValue.match(/(?=(\d{2}))/g);
+            matches.negative.onlyNumbers = ngModel.$viewValue.match(/^[0-9]*$/g);
+            matches.negative.onlyLetters = ngModel.$viewValue.match(/^([a-z]|[A-Z])*$/g);
+
+            counts.negative.consecLower = matches.negative.consecLower ? matches.negative.consecLower.length : 0;
+            counts.negative.consecUpper = matches.negative.consecUpper ? matches.negative.consecUpper.length : 0;
+            counts.negative.consecNumbers = matches.negative.consecNumbers ? matches.negative.consecNumbers.length : 0;
+
+            // Calculations
+            strength += counts.positive.numChars * 4;
+            if (counts.positive.upper) {
+              strength += (counts.positive.numChars - counts.positive.upper) * 2;
+            }
+            if (counts.positive.lower) {
+              strength += (counts.positive.numChars - counts.positive.lower) * 2;
+            }
+            if (counts.positive.upper || counts.positive.lower) {
+              strength += counts.positive.numbers * 4;
+            }
+            strength += counts.positive.symbols * 6;
+            strength += (counts.positive.middleSymbol + counts.positive.middleNumber) * 2;
+            strength += counts.positive.requirements * 2;
+
+            strength -= counts.negative.consecLower * 2;
+            strength -= counts.negative.consecUpper * 2;
+            strength -= counts.negative.consecNumbers * 2;
+
+            if (matches.negative.onlyNumbers) {
+              strength -= counts.positive.numChars;
+            }
+            if (matches.negative.onlyLetters) {
+              strength -= counts.positive.numChars;
+            }
+
+            strength = Math.max(0, Math.min(100, Math.round(strength)));
+
+            if (strength > 85) {
+              angular.forEach(strongest, function(el) {
+                el.style.backgroundColor = '#008cdd';
+              });
+            } else if (strength > 65) {
+              angular.forEach(strong, function(el) {
+                el.style.backgroundColor = '#6ead09';
+              });
+            } else if (strength > 30) {
+              angular.forEach(weak, function(el) {
+                el.style.backgroundColor = '#e09115';
+              });
+            } else {
+              weakest.style.backgroundColor = '#e01414';
+            }
+          }
+        });
+      },
+      template: '<span class="password-strength-indicator"><span></span><span></span><span></span><span></span></span>'
+    };
+  });
