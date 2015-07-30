@@ -9,7 +9,7 @@
    		moment = require('moment'); 
 		
 
-	mongoose.connect('mongodb://localhost/chaukasDB');
+	mongoose.connect(process.env.MONGOLAB_URI || 'mongodb://localhost/chaukasDB');
 	var User = require('../models/user.js');
 	var Incident = require('../models/incident.js');
 	var rawIncident = require('../models/rawIncident.js');
@@ -36,7 +36,10 @@
  		if(req.query.filter){
  			
  			var startDate, endDate;
- 			if(req.query.filter=='today'){
+ 			startDate=req.query.filter.substr(0,req.query.filter.indexOf(','));
+ 			endDate=req.query.filter.substr(req.query.filter.indexOf(',') +1); 	
+ 			
+ 			/*if(req.query.filter=='today'){
  				startDate=	getCurrentUTCDate()  ;
  				endDate=	getTomorrowUTCDate()  ; 				 
  			}
@@ -55,7 +58,7 @@
  			else {
  				startDate=req.query.filter.substr(0,req.query.filter.indexOf(','));
  				endDate=req.query.filter.substr(req.query.filter.indexOf(',') +1); 				
- 			}
+ 			}*/
  			console.log(startDate);
  			console.log(endDate);
 
@@ -69,7 +72,7 @@
  					"endDate":endDate,
  					"endDateParse":Date.parse(endDate)
  				});*/
- 
+
 				Incident.find({"date": {"$gte": new Date(startDate), "$lt": new Date(endDate)}},function(err,incidents){
 					if(err){
  						fnErrorResponse(res,  err);
