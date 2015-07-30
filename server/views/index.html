@@ -3,43 +3,98 @@
 	<head>
 		<title>chaUkas</title>
 		<link rel="stylesheet" type="text/css" href="/lib/bootstrap/dist/css/bootstrap.min.css" />
+		<link rel="stylesheet" type="text/css" href="/lib/font-awesome/css/font-awesome.min.css"></script>
+		 
+		<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-social/4.9.1/bootstrap-social.css"></script> 
+		<!-- <link rel="stylesheet" type="text/css" href="/lib/bootstrap-social/bootstrap-social.css"></script> -->
 		<link rel="stylesheet" type="text/css" href="/css/chaukas.css"/>
-		 <script src="https://maps.googleapis.com/maps/api/js?v=3.exp"></script>
+
+		<script src="https://maps.googleapis.com/maps/api/js?v=3.exp"></script>		
 		<script type="text/javascript" src="/lib/angular/angular.min.js"></script>
 		<script type="text/javascript" src="/lib/angular-route/angular-route.min.js"></script>
 		<script type="text/javascript" src="/lib/satellizer/satellizer.min.js"></script>
+		<script type="text/javascript" src="/lib/moment/moment.js"></script>		
+		<script type="text/javascript" src="/lib/moment-timezone/builds/moment-timezone-with-data-2010-2020.min.js"></script>		
+		
+		<script type="text/javascript" src="/lib/angular-moment/angular-moment.js"></script>
 		<script type="text/javascript" src="/js/app.js"></script>
 		<script type="text/javascript" src="/js/factory.js"></script>
 		<script type="text/javascript" src="/js/directive.js"></script>
 		<script type="text/javascript" src="/js/controller.js"></script>
 		<script src="/socket.io/socket.io.js"></script>
-	</head>
 
+	</head>
+<style>
+	.profile-pic {
+		width:40px;
+		height:40px;
+		float:right;
+		margin-left:5px;
+		border-radius:50%;
+		border:3px solid;
+	}
+	.no-profile-pic{
+		display: block;
+		float: right;
+		font-size: 26px;
+		color: #FFF;
+		border-radius: 70%;
+		border: 3px solid;
+		width: 40px;
+		height: 40px;
+		text-align: center;
+		background-color: #337ab7; 
+		 
+		margin-left: 5px;
+	}
+</style>
 	<body>
+		<div class="login-body"></div>
 		<div class="container-fluid">
 		 
 		</hr>
 		<div class="row-fluid"> 
 			<div class="col-xs-12">
-				<div class='container-fluid navbar navbar-default navbar-fixed-top main-nav'>
+				<div class='container-fluid navbar navbar-default navbar-fixed-top main-nav' ng-controller="navigationCtrl" ng-show="chaukasAuth.isLogged()" > 
 					<div class="row-fluid">
-						<div class="col-xs-4 title">cha<span style="font-size:36px;">u</span>kas </span>
- 
+						<div class="col-xs-3">
+							<div class="title">
+								cha
+								<span class="logo">U
+								<i class="fa fa-eye eye left-eye"></i>
+								<i class="fa fa-eye eye right-eye"></i>
+								</span>
+								kas </span>
+ 							</div>
 						</div>
 
 
-						<div class="col-xs-8">
-
-							<div class="nav-option">
-								<a  href="#/map"><img  src='/images/map.png' class="nav-icon" > Map</a>
+						<div class="col-md-9">
+							
+							 
+							<div class="nav-option" >
+								<a  href="#/login" ng-class="{selected:selectedNav=='login'}" ng-click="signOut()" title="Sign out">
+								<i class="fa fa-sign-out"></i> 
+								<span ng-bind="chaukasAuth.user.displayName"  > </span>
+								<img ng-show="chaukasAuth.user.picture" ng-src='{{chaukasAuth.user.picture}}' class="profile-pic" >
+								<span ng-hide="chaukasAuth.user.picture"  class="no-profile-pic">{{chaukasAuth.user.displayName.substr(0,1) }}</span>	
+								</a>
 							</div>
 							<div class="nav-option">
-								<a  href="#/incidents"><img  src='/images/list.png'  class="nav-icon" > List</a>
+								<a  href="#/map" ng-class="{selected:selectedNav=='map'}" ng-click="selectedNav='map'"> <i class="fa fa-globe" title="Map"></i>
+									<span > Map </span></a>
 							</div>
 							<div class="nav-option">
-								<a  href="#/raw"><img  src='/images/rawList.png' class="nav-icon" > Raw Data</a>
+								<a  href="#/incidents" ng-class="{selected:selectedNav=='list'}" ng-click="selectedNav='list'" title="List"><i class="fa fa-list-ul"></i>
+								<span > List </span></a>
 							</div>
+							<div class="nav-option">
+								<a  href="#/raw" ng-class="{selected:selectedNav=='rlist'}" ng-click="selectedNav='rlist'" title="Raw Data"> <i class="fa fa-list-ul"></i> 
+									<span  > Raw Data </span></a>
+							</div>
+							
 						</div>
+						 
 					</div>
 				</div>
 			</div>
