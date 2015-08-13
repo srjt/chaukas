@@ -5,7 +5,7 @@ var chaukas	=angular.module('chaukas',['ngRoute','satellizer','angularMoment'])
 			controller:'loginCtrl'
 		})
 		.when('/signup',{
-			templateUrl:'/partials/signUp.html',
+			templateUrl:'/partials/signup.html',
 			controller:'signupCtrl'
 		})
 		.when('/raw',{
