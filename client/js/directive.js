@@ -144,12 +144,17 @@ chaukas.directive('chaukasMap',['$window','$document','$compile','incidentsFacto
 					});	
 					lstMarkers.push(marker);					 
 					indxMarker=lstMarkers.length-1;
-
+					var infoWindow = new google.maps.InfoWindow();
+					
 					if(!scope.disableInfo) { 
 						google.maps.event.addListener(marker, 'click', (function(marker, pnt,scope) {					 
 					        return function() {
-					        	var infoWindow = new google.maps.InfoWindow();
-					        	if(!isInfoWindowOpen()){
+					        	function isInfoWindowOpen(iw){
+								    var map = iw.getMap();
+								    return (map !== null && typeof map !== "undefined");
+								}
+					        	
+					        	if(!isInfoWindowOpen(infoWindow)){
 						        	scope.pnt=pnt;
 						        	var markerId='chaukasMarker_' + pnt._id;
 						        	var infoContent= "<div style='' id='"+ markerId +"''>";
@@ -184,12 +189,8 @@ chaukas.directive('chaukasMap',['$window','$document','$compile','incidentsFacto
 					                });		                
 
 						            infoWindow.open(map, marker);
-
 						        }
-					            function isInfoWindowOpen(){
-								    var map = infoWindow.getMap();
-								    return (map !== null && typeof map !== "undefined");
-								}
+					           
 
 					        }
 	   			        })(marker, pnt,scope));				 					
