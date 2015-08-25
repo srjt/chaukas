@@ -1,6 +1,13 @@
 module.exports=function(server){ 
 	var io = require('socket.io').listen(server);
-
+	// Heroku won't actually allow us to use WebSockets
+	// so we have to setup polling instead.
+	// https://devcenter.heroku.com/articles/using-socket-io-with-node-js-on-heroku
+	io.configure(function () {  
+	  io.set("transports", ["xhr-polling"]); 
+	  io.set("polling duration", 10); 
+	});
+	
 	io.sockets.on('connection', function (socket) {
 		    socket.emit('message', { message: 'welcome to the chaukas' });
 		    
@@ -19,6 +26,9 @@ module.exports=function(server){
 		  	  for (var i = 0; i < io.sockets.sockets.length; i++) {
 		  	   	console.log(io.sockets.sockets[i].id);
 		  	  }; */
+
+		  	  console.log('emmitting newComment' + data
+		  	  	);
 		      io.sockets.emit('newComment',data);
 		      //socket.broadcast.emit('newIncident', data);
 		      fn(data);		     
