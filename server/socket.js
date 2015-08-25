@@ -7,8 +7,13 @@ module.exports=function(server){
 			// so we have to setup polling instead.
 			// https://devcenter.heroku.com/articles/using-socket-io-with-node-js-on-heroku
 			
-			io.set("transports", ["xhr-polling"]);
-  			io.set("polling duration", 10);
+			io.set('transports', ['websocket', 
+      'flashsocket', 
+      'htmlfile', 
+      'xhr-polling', 
+      'jsonp-polling', 
+      'polling']);
+  			//io.set("polling duration", 1);
 		    
 		    socket.emit('message', { message: 'welcome to the chaukas' });
 		    
@@ -28,8 +33,7 @@ module.exports=function(server){
 		  	   	console.log(io.sockets.sockets[i].id);
 		  	  }; */
 
-		  	  console.log('emmitting newComment' + data
-		  	  	);
+		  	  console.log('emmitting newComment');
 		      io.sockets.emit('newComment',data);
 		      //socket.broadcast.emit('newIncident', data);
 		      fn(data);		     
