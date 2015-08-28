@@ -80,15 +80,15 @@
 								<span ng-hide="chaukasAuth.user.picture"  class="no-profile-pic">{{chaukasAuth.user.displayName.substr(0,1) }}</span>	
 								</a>
 							</div>
-							<div class="nav-option">
+							<div class="nav-option" ng-show="chaukasAuth.isTestUser()">
 								<a  href="#/map" ng-class="{selected:selectedNav=='map'}" ng-click="selectedNav='map'"> <i class="fa fa-globe" title="Map"></i>
 									<span > Map </span></a>
 							</div>
-							<div class="nav-option">
+							<div class="nav-option" ng-show="chaukasAuth.isTestUser()">
 								<a  href="#/incidents" ng-class="{selected:selectedNav=='list'}" ng-click="selectedNav='list'" title="List"><i class="fa fa-list-ul"></i>
 								<span > List </span></a>
 							</div>
-							<div class="nav-option">
+							<div class="nav-option" ng-show="chaukasAuth.isTestUser()">
 								<a  href="#/raw" ng-class="{selected:selectedNav=='rlist'}" ng-click="selectedNav='rlist'" title="Raw Data"> <i class="fa fa-list-ul"></i> 
 									<span  > Raw Data </span></a>
 							</div>

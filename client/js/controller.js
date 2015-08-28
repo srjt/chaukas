@@ -1,4 +1,7 @@
 chaukas.controller('navigationCtrl',['$scope','$auth','$location','chaukasAuth',function($scope,$auth,$location,chaukasAuth){	
+	
+	$scope.chaukasAuth=chaukasAuth;	
+
 	function setSelctedNav(){
 		if($location.$$path.indexOf('map')>=0){
 			$scope.selectedNav='map';
@@ -10,7 +13,7 @@ chaukas.controller('navigationCtrl',['$scope','$auth','$location','chaukasAuth',
 			$scope.selectedNav='rlist';
 		}
 	}
-	$scope.chaukasAuth=chaukasAuth;	
+	
 	$scope.signOut=function(){
 		$auth.logout()
 		.then(function(){
