@@ -1,9 +1,6 @@
 
 $navHeight:50px;
-
-body {
-	background-color:#FAF0DC;	
-}
+ 
 
 .logo {
 	border: 3px solid #FFF;
@@ -36,7 +33,11 @@ body {
 	height:100%;
 }
 body {
+	//overflow:hidden;
+	background-color:#FAF0DC;
+	display:table;
 	overflow:hidden;
+	width:100%;
 }
 .container-fluid {
 	overflow:auto;
@@ -48,12 +49,16 @@ body {
 .main-nav {
 	height: $navHeight;
 	background-color: #FF6600;
+	display:table-row;
+  	margin:0;
   	overflow:visible;
-
+  	position:absolute;
+	top:0;
+	
 	.nav-option {
 		display:inline-block;
 		float:right;
-		padding:5px 10px;		
+		padding:4px 10px;		
 		z-index: 1;
 	}	 
 
@@ -85,8 +90,9 @@ body {
 }
 
 .content {
-	margin-top: 50px;
-
+	 
+	position:relative;
+	top: $navHeight;
 }
 
 .incident {

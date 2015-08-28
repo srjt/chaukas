@@ -11,7 +11,7 @@ chaukas.factory('chaukasAuth',['$window','$auth',function($window,$auth){
 			return $auth.isAuthenticated() && this.user!=undefined;
 		},
 		isTestUser:function(){
-			 if(this.user.isTestUser){
+			 if(this.user && this.user.isTestUser){
 			 	return true;
 			 }
 			 return false;
