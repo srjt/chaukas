@@ -11,5 +11,65 @@
 	</div>
 	<chaukas-map  enable-filter-control="true"  data="incidentsOnMap" current-city="currentCity"  add-data-point="addIncidentToMap" map-center="currentCity.position" remove-data-point="removeIncidentFromMap" ></chaukas-map>
 
+
+	<style >
+	 
+	 	.on-map-panel {
+	 		background-color: #FF6600;
+	 		border: 2px solid #FFF;
+	 		border-bottom: none;
+	 		color: #FFF;
+	 		cursor: pointer;
+	 		height: 100px;
+	 		min-width: 50px;
+	 		padding: 10px;
+	 		text-align: center;
+	 		-ms-transform: rotate(270deg);
+	 		-webkit-transform: rotate(270deg);
+	 		transform: rotate(270deg);
+		    -ms-transform-origin: right;
+		    -webkit-transform-origin: right;
+		    transform-origin: right;		    
+		    
+	 		 
+	 	}
+		.on-map-panel.right {
+			position: absolute;
+			right: 0;
+			top: 10%;
+		}
+		.on-map-panel:hover {
+
+		}
+		.on-map-panel.open {
+			height: 70%;
+			-ms-transform: none;
+	 		-webkit-transform: none;
+	 		transform: none; 
+	 		overflow: auto;
+		}
+		.on-map-list {			 
+			 background-color: #FFF;
+			 color: #848484;
+		}
+		.on-map-list ul {
+		 	list-style: none;
+		 	padding: 5px;
+		 	text-align: left;
+		}
+	</style>
+	<div class="on-map-panel right" ng-class='{open:showPanel}' ng-mouseenter="toggleListPanel(true)" ng-mouseleave="toggleListPanel(false)" ng-click="toggleListPanel(true)">
+		List 
+ 
+		<div ng-show="showPanel"   class="on-map-list" >
+			 
+			<ul>
+				<li ng-repeat="inc in incidentsOnMap">					 
+					<a   href="#/incidents/{{inc._id}} " > {{inc.title}} </a> 
+				</li>
+			</ul>
+		</div>
+	</div>
+
 </div>
  

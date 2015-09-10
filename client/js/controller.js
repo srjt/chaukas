@@ -82,13 +82,21 @@ chaukas.controller('chaukasMapCtrl',['$scope','incidentsFactory','chaukasSocket'
 	$scope.currentCity=chaukasUtils.currentCity;
 
 
+
  	chaukasSocket.on('newIncident', function (data) {
  		if(data) {
  			$scope.addToMap(data);
  		} 		 
     });
 
- 
+ 	$scope.init=function(){
+ 		$scope.toggleListPanel(false);
+ 	};
+
+ 	$scope.toggleListPanel=function(toggle){
+ 		$scope.showPanel=toggle;
+ 	}
+
     $scope.addTestData=function(){
 	    var testData=	{
 			    "_id": "0001",
@@ -146,6 +154,8 @@ chaukas.controller('chaukasMapCtrl',['$scope','incidentsFactory','chaukasSocket'
 			$scope.removeFromMap($scope.incidents[i]);
 		};
 	};
+
+	$scope.init();
 }]);
 chaukas.controller('chaukasListCtrl',['$scope','incidentsFactory','chaukasSocket',function($scope,incidentsFactory,chaukasSocket){
 	incidentsFactory.getIncidents().then(function(data){

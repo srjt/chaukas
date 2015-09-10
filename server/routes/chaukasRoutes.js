@@ -125,7 +125,7 @@
 							res.writeHead(200,{
 								'Content-Type':'application/json; charset=utf-8'
 							});
-							console.log('emitting addComment');
+							console.log('emitting addComment' );
 							socket.emit('addComment',{'incident':req.params.id,'comment':newComment},function(data){});
 							res.end(JSON.stringify(updatedIncident));
 						}

@@ -216,7 +216,8 @@ chaukas.directive('chaukasMap',['$window','$document','$compile','incidentsFacto
 			//google.maps.event.addDomListener($window.window, 'load', initialize);
 		},
 		controller:function($scope){
- 
+ 	
+ 			 
 		/*	$scope.postComment=function(incident){		 
 				
 				var newCommentData={};				

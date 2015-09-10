@@ -49,63 +49,54 @@
 	}
 </style>
 	<body>
-		<div class="login-body"></div>
-		<div class="container-fluid">
-		 
-		</hr>
-		<div class="row-fluid"> 
-			<div class="col-xs-12">
-				<div class='container-fluid navbar navbar-default navbar-fixed-top main-nav' ng-controller="navigationCtrl" ng-show="chaukasAuth.isLogged()" > 
-					<div class="row-fluid">
-						<div class="col-xs-3">
-							<div class="title">
-								cha
-								<span class="logo">U
-								<i class="fa fa-eye eye left-eye"></i>
-								<i class="fa fa-eye eye right-eye"></i>
-								</span>
-								kas </span>
- 							</div>
-						</div>
-
-
-						<div class="col-md-9">
-							
-							 
-							<div class="nav-option" >
-								<a  href="#/login" ng-class="{selected:selectedNav=='login'}" ng-click="signOut()" title="Sign out">
-								<i class="fa fa-sign-out"></i> 
-								<span ng-bind="chaukasAuth.user.displayName"  > </span>
-								<img ng-show="chaukasAuth.user.picture" ng-src='{{chaukasAuth.user.picture}}' class="profile-pic" >
-								<span ng-hide="chaukasAuth.user.picture"  class="no-profile-pic">{{chaukasAuth.user.displayName.substr(0,1) }}</span>	
-								</a>
+		<div class="login-body"></div>		
+			<div class='container-fluid navbar navbar-default navbar-fixed-top main-nav' ng-controller="navigationCtrl" ng-show="chaukasAuth.isLogged()" > 
+				<div class="row-fluid">
+					<div class="col-xs-3">
+						<div class="title">
+							cha
+							<span class="logo">U
+							<i class="fa fa-eye eye left-eye"></i>
+							<i class="fa fa-eye eye right-eye"></i>
+							</span>
+							kas </span>
 							</div>
-							<div class="nav-option" ng-show="chaukasAuth.isTestUser()">
-								<a  href="#/map" ng-class="{selected:selectedNav=='map'}" ng-click="selectedNav='map'"> <i class="fa fa-globe" title="Map"></i>
-									<span > Map </span></a>
-							</div>
-							<div class="nav-option" ng-show="chaukasAuth.isTestUser()">
-								<a  href="#/incidents" ng-class="{selected:selectedNav=='list'}" ng-click="selectedNav='list'" title="List"><i class="fa fa-list-ul"></i>
-								<span > List </span></a>
-							</div>
-							<div class="nav-option" ng-show="chaukasAuth.isTestUser()">
-								<a  href="#/raw" ng-class="{selected:selectedNav=='rlist'}" ng-click="selectedNav='rlist'" title="Raw Data"> <i class="fa fa-list-ul"></i> 
-									<span  > Raw Data </span></a>
-							</div>
-							
-						</div>
-						 
 					</div>
+
+
+					<div class="col-md-9">
+						
+						 
+						<div class="nav-option" >
+							<a  href="#/login" ng-class="{selected:selectedNav=='login'}" ng-click="signOut()" title="Sign out">
+							<!-- <i class="fa fa-sign-out"></i>  -->
+							<span ng-bind="chaukasAuth.user.displayName"  > </span>
+							<img ng-show="chaukasAuth.user.picture" ng-src='{{chaukasAuth.user.picture}}' class="profile-pic" >
+							<span ng-hide="chaukasAuth.user.picture"  class="no-profile-pic">{{chaukasAuth.user.displayName.substr(0,1) }}</span>	
+							</a>
+						</div>
+						<div class="nav-option" ng-show="chaukasAuth.isTestUser()">
+							<a  href="#/map" ng-class="{selected:selectedNav=='map'}" ng-click="selectedNav='map'"> <i class="fa fa-globe" title="Map"></i>
+								<!-- <span > Map </span> -->
+							</a>
+						</div>
+						<div class="nav-option" ng-show="chaukasAuth.isTestUser()">
+							<a  href="#/incidents" ng-class="{selected:selectedNav=='list'}" ng-click="selectedNav='list'" title="List"><i class="fa fa-list-ul"></i>
+							<!-- <span > List </span> -->
+						</a>
+						</div>
+						<div class="nav-option" ng-show="chaukasAuth.isTestUser()">
+							<a  href="#/raw" ng-class="{selected:selectedNav=='rlist'}" ng-click="selectedNav='rlist'" title="Raw Data"> <i class="fa fa-list-ul"></i> 
+								<!-- <span  > Raw Data </span> -->
+							</a>
+						</div>
+						
+					</div>
+					 
 				</div>
 			</div>
-		</div>	
-		<div class="row-fluid full-height"> 
-			<div class="col-xs-12 content full-height" >
+			 <div class="content full-height" >
 				<ng-view  ></ng-view>
-			</div>
-		</div>	
-		
-		</div>		 
+			</div>	 
 	</body>
-
 </html>
