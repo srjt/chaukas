@@ -1,6 +1,5 @@
-
-$navHeight:50px;
- 
+$navHeight:40px;
+  
 
 .logo {
 	border: 3px solid #FFF;
@@ -36,7 +35,7 @@ body {
 	//overflow:hidden;
 	background-color:#FAF0DC;
 	display:table;
-	overflow:hidden;
+	 
 	width:100%;
 }
 .container-fluid {
@@ -47,9 +46,11 @@ body {
 	height:100%;
 }
 .main-nav {
-	height: $navHeight;
-	background-color: #FF6600;
+	
+	background-color: #FF6600; 
 	display:table-row;
+	height:$navHeight;
+	min-height: $navHeight !important;	
   	margin:0;
   	overflow:visible;
   	position:absolute;
@@ -60,6 +61,10 @@ body {
 		float:right;
 		padding:4px 10px;		
 		z-index: 1;
+
+		a {
+			color:#FFF;
+		}
 	}	 
 
 	.nav-option:hover {
@@ -68,13 +73,10 @@ body {
 
 	.title {
 		color:#FFF;
-		padding-top:15px;
-
-
 	}
 	
 	a {
-		font-size:26px;
+		font-size:20px;
 		i {
 			color:#337ab7;
 		}
@@ -92,7 +94,8 @@ body {
 .content {
 	 
 	position:relative;
-	top: $navHeight;
+	 
+	 
 }
 
 .incident {

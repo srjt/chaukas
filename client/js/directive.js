@@ -22,8 +22,20 @@ chaukas.directive('chaukasMap',['$window','$document','$compile','incidentsFacto
 			  	var mapOptions = {
 			    	zoom: 11,
 			    	//center: (scope.currentCity) ? new google.maps.LatLng(scope.currentCity.latitude, scope.currentCity.longitude): undefined,
-			    	mapTypeId: google.maps.MapTypeId.ROADMAP
-			    
+			    	mapTypeId: google.maps.MapTypeId.ROADMAP,
+			    	mapTypeControl: false,
+			    	panControlOptions:{
+			    	  position: google.maps.ControlPosition.RIGHT_BOTTOM	
+			    	},
+				     
+				    zoomControl: true,
+				    zoomControlOptions: {
+				        style: google.maps.ZoomControlStyle.DEFAULT,
+				        position: google.maps.ControlPosition.LEFT_CENTER
+				    },
+				    scaleControl: true,
+				    streetViewControl: false,
+				    
 			  	};
 			  	map = new google.maps.Map(element[0],mapOptions);		 
 			  
@@ -73,7 +85,7 @@ chaukas.directive('chaukasMap',['$window','$document','$compile','incidentsFacto
 
 					filterScope=scope.$new();        	 
 		        	var compiledFilterControl=$compile(filterControl)(filterScope)
-					map.controls[google.maps.ControlPosition.TOP_LEFT].push(compiledFilterControl[0]);
+					map.controls[google.maps.ControlPosition.LEFT_TOP].push(compiledFilterControl[0]);
 				}
 			}
 			
@@ -217,7 +229,7 @@ chaukas.directive('chaukasMap',['$window','$document','$compile','incidentsFacto
 		},
 		controller:function($scope){
  	
- 			 
+
 		/*	$scope.postComment=function(incident){		 
 				
 				var newCommentData={};				

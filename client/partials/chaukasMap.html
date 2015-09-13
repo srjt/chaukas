@@ -16,53 +16,113 @@
 	 
 	 	.on-map-panel {
 	 		background-color: #FF6600;
-	 		border: 2px solid #FFF;
+	 		border: 1px solid #FFF;
 	 		border-bottom: none;
 	 		color: #FFF;
 	 		cursor: pointer;
-	 		height: 100px;
+	 		margin-right:15px;  
 	 		min-width: 50px;
-	 		padding: 10px;
+	 		padding: 5px 15px;
 	 		text-align: center;
 	 		-ms-transform: rotate(270deg);
 	 		-webkit-transform: rotate(270deg);
 	 		transform: rotate(270deg);
 		    -ms-transform-origin: right;
 		    -webkit-transform-origin: right;
-		    transform-origin: right;		    
-		    
-	 		 
+		    transform-origin: right;	 	
+		    z-index: 1;	 
 	 	}
-		.on-map-panel.right {
-			position: absolute;
-			right: 0;
-			top: 10%;
-		}
-		.on-map-panel:hover {
-
-		}
-		.on-map-panel.open {
-			height: 70%;
+	 	.on-map-panel.open {
+			bottom: 10px;
+			left:70%;
+			top:40px !important;			 
+			margin: 0;
 			-ms-transform: none;
 	 		-webkit-transform: none;
 	 		transform: none; 
 	 		overflow: auto;
 		}
+		.on-map-panel:hover{
+			border: 1px solid #FFF;
+			box-shadow: -3px -3px 1px rgba(236,141,77,.4);
+		}
+	 	.on-map-panel.shrink {
+	 		margin-right: 3px;
+	 		z-index: 2;
+	 	}
+	 	.on-map-panel.shrink:hover {	 		
+			margin-right:15px;  
+	 	}
+	 	 
+		.on-map-panel.right {
+			position: absolute;
+			right: 0;			
+		}
+		.on-map-panel.right.first {
+			top: 50px;
+		}
+		.on-map-panel.right.second {
+			top: 130px;
+		}
+		.on-map-panel.right.third {
+			top: 222px;
+		}	
+		.on-map-panel .close-panel {
+			right: 0;
+		    position: absolute;
+		    top: 0;
+		    margin: 2px 5px;
+		    font-size: medium;
+		}		
 		.on-map-list {			 
 			 background-color: #FFF;
-			 color: #848484;
+			 bottom: 10px;
+			 color: #848484;	
+			 direction: rtl;
+			 left: 10px;
+			 right: 10px;
+			 overflow: auto;
+			 position: absolute;
+			 top: 30px;		 
 		}
+		
 		.on-map-list ul {
 		 	list-style: none;
 		 	padding: 5px;
 		 	text-align: left;
 		}
+
+		.form-report {
+			direction: ltr;
+		}
 	</style>
-	<div class="on-map-panel right" ng-class='{open:showPanel}' ng-mouseenter="toggleListPanel(true)" ng-mouseleave="toggleListPanel(false)" ng-click="toggleListPanel(true)">
-		List 
- 
-		<div ng-show="showPanel"   class="on-map-list" >
-			 
+
+	<div class="on-map-panel right first" ng-class="getPanelState(PANELS.report)" ng-click="onPanelClick(PANELS.report)">
+		Report <div class="close-panel"  ng-show="openPanel==PANELS.report"  ng-click="closePanel()">X</div>
+		
+		<div ng-show="openPanel==PANELS.report"   class="on-map-list" >
+ Not implemented
+			<form class="form-report" role="form">
+				<table >
+					<tr>
+						<td><label class="control-label col-sm-2" for="title">Title:</label></td>
+						<td><input type="text" class="form-control" id="title" placeholder="Enter title"></td>
+					<tr>
+					<tr>
+						<td><label class="control-label col-sm-2"  >Position:</label></td>
+						<td><input type="number" class="form-control" id="lat" ><input type="number" class="form-control" id="long"  ></td>
+					<tr>
+					<tr>
+						<td colspan="2"><button type="submit" class="btn btn-default">Submit</button></td>						 
+					<tr>											
+				</table> 
+			</form>		
+		</div>
+	</div>
+
+	<div class="on-map-panel right second" ng-class="getPanelState(PANELS.list)" ng-click="onPanelClick(PANELS.list)">
+		Incidents    <div class="close-panel" ng-show="openPanel==PANELS.list" ng-click="closePanel()">X</div>
+		<div ng-show="openPanel==PANELS.list"   class="on-map-list" >		 			 
 			<ul>
 				<li ng-repeat="inc in incidentsOnMap">					 
 					<a   href="#/incidents/{{inc._id}} " > {{inc.title}} </a> 
@@ -70,6 +130,14 @@
 			</ul>
 		</div>
 	</div>
+	
+	<div class="on-map-panel right third" ng-class="getPanelState(PANELS.settings)" ng-click="onPanelClick(PANELS.settings)">
+		Settings   <div class="close-panel" ng-show="openPanel==PANELS.settings" ng-click="closePanel()">X</div>
+		<div ng-show="openPanel==PANELS.settings"   class="on-map-list" >		 			 
+			Not implemented
+		</div>
+	</div>
+
 
 </div>
  

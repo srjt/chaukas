@@ -80,7 +80,11 @@ chaukas.controller('chaukasMapCtrl',['$scope','incidentsFactory','chaukasSocket'
 	//$scope.incidents=[];
 	$scope.incidentsOnMap=[];
 	$scope.currentCity=chaukasUtils.currentCity;
-
+	$scope.PANELS={
+		list:1,
+		report:2,
+		settings:3
+	};
 
 
  	chaukasSocket.on('newIncident', function (data) {
@@ -90,13 +94,39 @@ chaukas.controller('chaukasMapCtrl',['$scope','incidentsFactory','chaukasSocket'
     });
 
  	$scope.init=function(){
- 		$scope.toggleListPanel(false);
+ 		
+ 		 
  	};
+    
 
- 	$scope.toggleListPanel=function(toggle){
- 		$scope.showPanel=toggle;
- 	}
-
+    $scope.getPanelState=function(panel){  
+    	var cls='';  	 
+    	if($scope.openPanel){ 
+	    	if($scope.openPanel==panel){
+	    		cls='open';
+	    	}
+	    	else {cls='shrink'}
+    	}
+    	return cls;    	 
+    };
+	$scope.isHoveredPanel=function(panel){
+		if($scope.hoveredPanel==panel){
+			return 'hovered';
+		}
+		return '';
+	} 
+    $scope.onPanelClick=function(panel){
+    	if(!$scope.closingPanel){
+			$scope.openPanel=panel; 
+		}
+		else {
+			$scope.openPanel=null;	
+			$scope.closingPanel=false;	
+		}
+    }; 
+ 	$scope.closePanel=function(){
+ 		$scope.closingPanel=true;
+ 	}; 
     $scope.addTestData=function(){
 	    var testData=	{
 			    "_id": "0001",
@@ -122,10 +152,7 @@ chaukas.controller('chaukasMapCtrl',['$scope','incidentsFactory','chaukasSocket'
  
 		chaukasSocket.emit('addIncident',testData,dataAdded);
 	}
-
-
 	$scope.addToMap=function(data){
-
 		if(!data.onMap){
 			data.onMap=true;
 			 $scope.addIncidentToMap(data);			 
