@@ -232,7 +232,7 @@ chaukas.directive('chaukasMap',['$window','$document','$compile','incidentsFacto
 						        		infoContent+= "  <a target='_blank' href='" + pnt.link + "'>" + pnt.title + "</a> <br/>" ;
 						        	}
 						        	else {
-						        		infoContent+=     pnt.title + "  <br/>" ;	
+						        		infoContent+=    "<b>" + pnt.title + " </b> <br/>" ;	
 						        	}
 						        	infoContent += pnt.address + "</div>"
 							        infoContent +='<chaukas-comments incident=incident > </chaukas-comments>'
