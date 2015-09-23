@@ -85,10 +85,22 @@ chaukas.factory('incidentsFactory',['$http','$q','chaukasAuth',function($http,$q
 			deferred.reject(errMsg);
 		};
 
-		$http.post(urlBase+'incidents/' + incidentId,{"user":chaukasAuth.user,"comment":comment }).success(success).error(error);
+		$http.post(urlBase+'incident/' + incidentId,{"user":chaukasAuth.user,"comment":comment }).success(success).error(error);
 		return deferred.promise;
-
 	}
+
+	_incidentDataService.postIncident=function(incident){
+		var deferred=$q.defer();
+		var success=function(data){
+			deferred.resolve(data);
+		};
+		var error=function(errMsg){
+			deferred.reject(errMsg);
+		};
+
+		$http.post(urlBase+'incident' ,incident).success(success).error(error);
+		return deferred.promise;
+	};
 	return _incidentDataService;
 }]);
 chaukas.factory('chaukasSocket', ['$rootScope',function ($rootScope) {

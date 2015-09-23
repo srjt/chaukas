@@ -99,9 +99,22 @@
  		}); 		
 	});
 
-	router.post('/api/incidents/:id',function   (req,res,next) {		
+ 	router.post('/api/incident',function(req,res,next){
+	    var incident = new Incident({
+	      title: req.body.title,
+	      longitude: req.body.longitude,
+	      latitude: req.body.latitude,
+	      address:req.body.address,
+	      date:getCurrentUTCDate()
+	    });
+	    incident.save(function() {	  
+	    	socket.emit('addIncident',{'incident': incident},function(data){});  	 
+	      	res.send({ 'incident': incident });
+	    }); 		 
+ 	});
+	router.post('/api/incident/:id',function   (req,res,next) {
 		Incident.findOne({_id:req.params.id},function(err, incident){
-			if(incident){				
+			if(incident){
 				var updIncident={};			 
 				updIncident.comments=incident.comments;
 				var newComment=req.body;
@@ -133,7 +146,19 @@
 			}
 		});		 		 
 	});
-
+	router.put('/api/incident/:id',function   (req,res,next) {
+		console.log(req.params.id);
+		Incident.remove({_id:req.params.id},function(err){
+			console.log('removed');
+			console.log(err);
+			if (!err) {
+		        res.status(200).send();
+		    }
+		    else {
+		    	fnErrorResponse(err);         
+		    }
+		});		 		 
+	});
 
 	 
 

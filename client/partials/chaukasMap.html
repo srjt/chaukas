@@ -9,7 +9,7 @@
 		<span>{{incidentsOnMap.length}}</span>  
 		<input type='button' ng-click="addTestData()" value="Add Test Data" />
 	</div>
-	<chaukas-map  enable-filter-control="true"  data="incidentsOnMap" current-city="currentCity"  add-data-point="addIncidentToMap" map-center="currentCity.position" remove-data-point="removeIncidentFromMap" ></chaukas-map>
+	<chaukas-map  enable-filter-control="true"  data="incidentsOnMap" current-city="currentCity"  add-data-point="addIncidentToMap"  map-center="currentCity.position" remove-data-point="removeIncidentFromMap" ></chaukas-map>
 
 
 	<style >
@@ -94,6 +94,13 @@
 
 		.form-report {
 			direction: ltr;
+			width: 100%;
+		}
+		.input-box{
+			margin: 10px 25px;
+		}
+		.report-btn {
+			float: left;
 		}
 	</style>
 
@@ -101,22 +108,14 @@
 		Report <div class="close-panel"  ng-show="openPanel==PANELS.report"  ng-click="closePanel()">X</div>
 		
 		<div ng-show="openPanel==PANELS.report"   class="on-map-list" >
- Not implemented
-			<form class="form-report" role="form">
-				<table >
-					<tr>
-						<td><label class="control-label col-sm-2" for="title">Title:</label></td>
-						<td><input type="text" class="form-control" id="title" placeholder="Enter title"></td>
-					<tr>
-					<tr>
-						<td><label class="control-label col-sm-2"  >Position:</label></td>
-						<td><input type="number" class="form-control" id="lat" ><input type="number" class="form-control" id="long"  ></td>
-					<tr>
-					<tr>
-						<td colspan="2"><button type="submit" class="btn btn-default">Submit</button></td>						 
-					<tr>											
-				</table> 
-			</form>		
+ 		   
+ 			<div class="form-report">
+ 				<div class="input-box"><input type="text" class="form-control" id="searchPlace" placeholder="Current Location"  / ></div>
+ 				<div class="input-box"><input type="text" class="form-control" id="title" placeholder="Enter title" ng-model="newIncident.title" /> </div>
+ 				<div class="input-box report-btn"><button  class="btn btn-default" ng-click="reportNewIncident()">Report</button></div>
+ 			</div>  
+
+			 
 		</div>
 	</div>
 

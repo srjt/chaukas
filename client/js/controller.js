@@ -86,18 +86,53 @@ chaukas.controller('chaukasMapCtrl',['$scope','incidentsFactory','chaukasSocket'
 		settings:3
 	};
 
-
  	chaukasSocket.on('newIncident', function (data) {
- 		if(data) {
- 			$scope.addToMap(data);
+ 		console.log(data);
+ 		if(data && data.incident) {
+ 			data.incident.moveMap=true;
+ 			addToMap(data.incident);
  		} 		 
     });
 
+
+    var autocomplete;
+	if (navigator.geolocation) {
+	    navigator.geolocation.getCurrentPosition(function(position){
+	      $scope.$apply(function(){
+	        $scope.currentPosition = position;
+	      });
+	      var geolocation = {
+	        lat: position.coords.latitude,
+	        lng: position.coords.longitude
+	      };
+	      var circle = new google.maps.Circle({
+	        center: geolocation,
+	        radius: 10//position.coords.accuracy
+	      });
+	      autocomplete.setBounds(circle.getBounds());
+	    });
+  	}
+ 	
  	$scope.init=function(){
  		
- 		 
+ 		var defaultBounds =new google.maps.Circle({center:  new google.maps.LatLng(28.6480367, 77.2129871), radius: 10}).getBounds();
+
+		var input = document.getElementById('searchPlace');
+		var options = {
+		  bounds: defaultBounds,
+		  types: ['establishment','geocode']
+		};
+		autocomplete = new google.maps.places.Autocomplete(input, options); 
+		autocomplete.addListener('place_changed', newIncidentlocationChanged);		 
  	};
     
+    function newIncidentlocationChanged(){
+    	var place = autocomplete.getPlace();	
+    	$scope.newIncident.address=place.formatted_address;
+    	$scope.newIncident.latitude= place.geometry.location.lat()
+    	$scope.newIncident.longitude=place.geometry.location.lng();
+    }
+ 
 
     $scope.getPanelState=function(panel){  
     	var cls='';  	 
@@ -118,15 +153,50 @@ chaukas.controller('chaukasMapCtrl',['$scope','incidentsFactory','chaukasSocket'
     $scope.onPanelClick=function(panel){
     	if(!$scope.closingPanel){
 			$scope.openPanel=panel; 
+			if(panel==$scope.PANELS.report){				
+				addNewIncident();	
+			}
 		}
 		else {
 			$scope.openPanel=null;	
-			$scope.closingPanel=false;	
-		}
+			$scope.closingPanel=false;
+			if(panel==$scope.PANELS.report){ 				
+				removeNewIncident();
+			}	
+		}		 
     }; 
  	$scope.closePanel=function(){
  		$scope.closingPanel=true;
  	}; 
+    function getNewIncident(){
+    	if(typeof $scope.newIncident=='undefined'){
+			$scope.newIncident ={
+				_id:"newIncidentFakeID",
+	 			 
+	 			longitude:$scope.currentPosition.coords.longitude,
+	 			latitude:$scope.currentPosition.coords.latitude,
+	 			icon:'/images/report-inc-marker.svg',
+	 			newIncident:true
+	 		};
+		}
+		return $scope.newIncident;
+    }
+    function addNewIncident(){
+    	addToMap(getNewIncident());
+    }
+    function removeNewIncident(){
+    	removeFromMap($scope.newIncident);
+    	$scope.currentPosition.title='';
+		delete $scope.newIncident ;
+    }
+ 	$scope.reportNewIncident=function(){
+ 	 
+ 		incidentsFactory.postIncident($scope.newIncident).then(function(data){			
+			removeNewIncident();
+		},function(errMsg){
+			console.log(errMsg);
+		});	
+ 	};
     $scope.addTestData=function(){
 	    var testData=	{
 			    "_id": "0001",
@@ -152,12 +222,12 @@ chaukas.controller('chaukasMapCtrl',['$scope','incidentsFactory','chaukasSocket'
  
 		chaukasSocket.emit('addIncident',testData,dataAdded);
 	}
-	$scope.addToMap=function(data){
+	function addToMap(data){
 		if(!data.onMap){
 			data.onMap=true;
 			 $scope.addIncidentToMap(data);			 
 		}
-	};
+	}
 
 	$scope.addAllToMap=function(){
 		for (var i = 0; i < $scope.incidents.length; i++) {	
@@ -166,7 +236,7 @@ chaukas.controller('chaukasMapCtrl',['$scope','incidentsFactory','chaukasSocket'
 	};
 
 	
-	$scope.removeFromMap=function(data){
+	function removeFromMap(data){
 		if(data.onMap) {
 			data.onMap=false;
 			var ret=$scope.removeIncidentFromMap(data);
@@ -174,7 +244,7 @@ chaukas.controller('chaukasMapCtrl',['$scope','incidentsFactory','chaukasSocket'
 				console.log('here');
 			}
 		}
-	};
+	}
 
 	$scope.removeAllFromMap=function(){
 		for (var i = 0; i < $scope.incidents.length; i++) {

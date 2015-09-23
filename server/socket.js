@@ -21,7 +21,8 @@ module.exports=function(server){
 		        io.sockets.emit('message', data);
 		    });
 
-		    socket.on('addIncident', function (data, fn) {		     
+		    socket.on('addIncident', function (data, fn) {	
+		    	console.log('adding incident'); 	     
 		      io.sockets.emit('newIncident',data);
 		      //socket.broadcast.emit('newIncident', data);
 		      fn(data);		     

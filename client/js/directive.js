@@ -35,11 +35,41 @@ chaukas.directive('chaukasMap',['$window','$document','$compile','incidentsFacto
 				    },
 				    scaleControl: true,
 				    streetViewControl: false,
-				    
-			  	};
+				};
 			  	map = new google.maps.Map(element[0],mapOptions);		 
-			  
 
+
+				//------------------PLACES------------------------			  
+				service = new google.maps.places.PlacesService(map);
+
+				function performSearch() {
+				  var request = {
+				    bounds:new google.maps.Circle({center:  new google.maps.LatLng(28.6480367, 77.2129871), radius: 100}).getBounds(),
+				    keyword: 'new'
+				  };
+				  service.radarSearch(request, callback);
+				}
+
+				function callback(results, status) {
+				  if (status !== google.maps.places.PlacesServiceStatus.OK) {
+				    console.log(status);
+				    return;
+				  }
+				  for (var i = 0, result; result = results[i]; i++) {
+				    //console.log(result);
+				    service.getDetails(result,function(detail,status){
+				    	if (status !== google.maps.places.PlacesServiceStatus.OK) {
+					       console.error(status);
+					       return;
+					    } else {
+					    	console.log(detail.name);
+					    }
+				    });
+				  }
+				}
+				//performSearch();
+
+				//------------------PLACES------------------------
 				if(scope.enableFilterControl) {
 					var filterControl = document.createElement('div');
 					var attFilterControl = document.createAttribute("filter-control"); 
@@ -53,10 +83,7 @@ chaukas.directive('chaukasMap',['$window','$document','$compile','incidentsFacto
 					attDateRange.value='initDateRange';
 					filterControl.setAttributeNode(attDateRange);
 
-
-
 					scope.fnDateRangeChanged=function(dateRange,startDate,endDate){ 
-
 						if(dateRange!='custom'){
 							incidentsFactory.getIncidents(startDate,endDate).then(function(data){
 								scope.data=data.data;	
@@ -75,7 +102,6 @@ chaukas.directive('chaukasMap',['$window','$document','$compile','incidentsFacto
 								console.log(errMsg);
 							}) ;	
 						}
-						 
 					};
 					var attDateRangeChanged=document.createAttribute('date-range-changed');
 					attDateRangeChanged.value='fnDateRangeChanged(dateRange,startDate,endDate)';
@@ -87,6 +113,8 @@ chaukas.directive('chaukasMap',['$window','$document','$compile','incidentsFacto
 		        	var compiledFilterControl=$compile(filterControl)(filterScope)
 					map.controls[google.maps.ControlPosition.LEFT_TOP].push(compiledFilterControl[0]);
 				}
+
+				
 			}
 			
 		 
@@ -147,13 +175,41 @@ chaukas.directive('chaukasMap',['$window','$document','$compile','incidentsFacto
 			
 			addMarker=function(pnt){
 				var indxMarker=-1;
- 				if(pnt && pnt.latitude && pnt.longitude	    ){   					 
-					marker = new google.maps.Marker({
-						position: new google.maps.LatLng(pnt.latitude,pnt.longitude),
-					    map: map,
-					    title:pnt.title,
-					    animation: google.maps.Animation.DROP
-					});	
+ 				if(pnt && pnt.latitude && pnt.longitude	    ){   
+					if(pnt.newIncident){
+						var image = {
+						  url: pnt.icon,
+						  // size: new google.maps.Size(71, 71),
+						   origin: new google.maps.Point(0, 0),
+						  // anchor: new google.maps.Point(17, 34),
+						  scaledSize: new google.maps.Size(51, 51)
+						};
+
+						marker = new google.maps.Marker({
+							position: new google.maps.LatLng(pnt.latitude,pnt.longitude),
+						    map: map,
+						    title:pnt.title,
+						    icon:image,
+						    animation: google.maps.Animation.DROP 
+						});	
+
+						map.setZoom(25); 
+						scope.mapCenter=pnt;
+
+						//map.setCenter(new google.maps.LatLng(pnt.latitude, pnt.longitude));
+					}
+					else {
+						marker = new google.maps.Marker({
+							position: new google.maps.LatLng(pnt.latitude,pnt.longitude),
+						    map: map,
+						    title:pnt.title,
+						    animation: google.maps.Animation.DROP
+						});	
+
+						if(pnt.moveMap){
+							scope.mapCenter=pnt;
+						}
+					}
 					lstMarkers.push(marker);					 
 					indxMarker=lstMarkers.length-1;
 					var infoWindow = new google.maps.InfoWindow();
@@ -169,9 +225,15 @@ chaukas.directive('chaukasMap',['$window','$document','$compile','incidentsFacto
 					        	if(!isInfoWindowOpen(infoWindow)){
 						        	scope.pnt=pnt;
 						        	var markerId='chaukasMarker_' + pnt._id;
-						        	var infoContent= "<div style='' id='"+ markerId +"''>";
-						        	infoContent +="<div style='width:50px;height:50px;float:left;margin-right:10px;border:1px solid lightgray'>News PIC</div>"
-						        	infoContent+= " <div> <a target='_blank' href='" + pnt.link + "'>" + pnt.title + "</a> <br/>" ;
+						        	var infoContent= "<div style='' id='"+ markerId +"''>  "  ;
+						        	infoContent +="<div style='width:50px;height:50px;float:left;margin-right:10px;border:1px solid lightgray'>News PIC</div>";
+						        	infoContent+= " <div> ";
+						        	if(pnt.link){ 
+						        		infoContent+= "  <a target='_blank' href='" + pnt.link + "'>" + pnt.title + "</a> <br/>" ;
+						        	}
+						        	else {
+						        		infoContent+=     pnt.title + "  <br/>" ;	
+						        	}
 						        	infoContent += pnt.address + "</div>"
 							        infoContent +='<chaukas-comments incident=incident > </chaukas-comments>'
 							       /* infoContent += "<textarea type='text' style='width:100%' ng-model='newComment'> </textarea> "								        	
@@ -201,6 +263,7 @@ chaukas.directive('chaukasMap',['$window','$document','$compile','incidentsFacto
 					                });		                
 
 						            infoWindow.open(map, marker);
+
 						        }
 					           
 

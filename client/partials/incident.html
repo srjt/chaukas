@@ -1,11 +1,11 @@
 <div class='cmnts' style="padding:5px 0;margin-top:50px" >
- 	  
+ 	  {{incident._id}}
  	<div class="incident">
  		<div class="map-image">
-			<chaukas-map   map-center="incident" map-zoom="15" disable-info="true" add-data-point="addIncidentToMap" remove-data-point="removeIncidentFromMap"></chaukas-map>
+			<chaukas-map   map-center="incident" map-zoom="25" disable-info="true" add-data-point="addIncidentToMap" remove-data-point="removeIncidentFromMap"></chaukas-map>
  		</div>
  		<div class="comments">
- 			 <div ><a href="#/map">Map >>  </a> <a href="{{incident.link}}" target="_blank">  {{incident.title}}</a></div>
+ 			 <div ><a href="#/map">Map   </a> >> <a href="{{incident.link}}" target="_blank">   {{incident.title}}</a></div>
  			<chaukas-comments incident="incident"   max-comments="10" full-page="true"> </chaukas-comments>	
  		</div>
  	<div> 

@@ -1,0 +1,4 @@
+followed below article for Heroku deployment. Didn't have to perform steps from 6-9 becuase SSH keys were already there (might be set while trying google cloud plateform)
+http://www.tilcode.com/deploying-a-mean-stack-app-to-heroku/
+
+--  "git push heroku master" was failing, so i created package.jsong, committed to githut and then connected github using dashboard.heroku.com and deployed
