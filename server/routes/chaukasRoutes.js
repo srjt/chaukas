@@ -30,35 +30,41 @@
 			res.json(rawIncidents);
 		});		 
 	});
+ 	router.get('/api/incidents/nearby/:latitude/:longitude',function  (req,res) {
+ 		 
  
- 	router.get('/api/incidents',function  (req,res) {
+		Incident.find({loc:  { '$geoWithin' :{
+								            '$box':[[77.21058524002228,28.626518378657526],[77.23989642013703,28.638308247875997]]  
+								          }
+								       }}
+// "loc":  { "$near" :{
+// 								            "$geometry": { "type": "Point", 
+// 								            				"coordinates": [  req.params.longitude,req.params.latitude]
+// 								            			 },
+// 								            "$maxDistance":80467.2 //50 miles  
+// 								          }
+// 								       }
+								       )
+				.limit(20)
+				.populate('user')
+				.exec(function(err,incident){ 				    			 
+	 				if(err){
+	 					fnErrorResponse(res,  err);
+	 				}
+	 				else{
+	 					 
+	 					res.json(incident);
+	 				}
+ 				}); 
 
+ 	});
+ 	router.get('/api/incidents/:swLng/:swLat/:neLng/:neLat',function  (req,res) {
  		if(req.query.filter){
  			
  			var startDate, endDate;
  			startDate=req.query.filter.substr(0,req.query.filter.indexOf(','));
- 			endDate=req.query.filter.substr(req.query.filter.indexOf(',') +1); 	
- 			
- 			/*if(req.query.filter=='today'){
- 				startDate=	getCurrentUTCDate()  ;
- 				endDate=	getTomorrowUTCDate()  ; 				 
- 			}
- 			else if (req.query.filter=='week'){
-				startDate=	getBackUTCDate(7)  ;
- 				endDate=	 getCurrentUTCDate() ;
- 			}
- 			else if(req.query.filter=='month'){
-				startDate=  	getBackUTCDate(30);
- 				endDate=	getCurrentUTCDate()  ;
- 			}
- 			else if(req.query.filter=='year'){
-				startDate=	getBackUTCDate(365);
- 				endDate=	getCurrentUTCDate()    ;
- 			} 			
- 			else {
- 				startDate=req.query.filter.substr(0,req.query.filter.indexOf(','));
- 				endDate=req.query.filter.substr(req.query.filter.indexOf(',') +1); 				
- 			}*/
+ 			endDate=req.query.filter.substr(req.query.filter.indexOf(',') +1); 	 			 
+ 
  			console.log(startDate);
  			console.log(endDate);
 
@@ -66,21 +72,19 @@
  				fnErrorResponse(res,'invalid request');
  			}
  			else { 
-				/*res.json({
- 					"startDate":startDate,
- 					"startDateParse":Date.parse(startDate),
- 					"endDate":endDate,
- 					"endDateParse":Date.parse(endDate)
- 				});*/
-
-				Incident.find({"date": {"$gte": new Date(startDate), "$lt": new Date(endDate)}},function(err,incidents){
-					if(err){
- 						fnErrorResponse(res,  err);
- 					}
- 					else {
- 						res.json(incidents);
- 					}
-				});				
+				Incident.find({"date": {"$gte": new Date(startDate), "$lt": new Date(endDate)},
+								"loc":  { "$geoWithin" :{ "$box": [ [ parseFloat(  req.params.swLng),parseFloat( req.params.swLat)],
+																	[ parseFloat(req.params.neLng),parseFloat(req.params.neLat)] ] } }
+							  })
+						.populate('user')
+						.exec(function(err,incident){ 			 
+			 				if(err){
+			 					fnErrorResponse(res,  err);
+			 				}
+			 				else{
+			 					res.json(incident);
+			 				}
+		 				}); 				
  				
  			}
  		}
@@ -92,7 +96,8 @@
 	});
 
  	router.get('/api/incidents/:id',function  (req,res) {
- 		Incident.findOne({_id:req.params.id})
+ 		Incident.findOne({_id:req.params.id}) 	
+ 		.populate('user')
  		.populate('comments.user').exec(function(err,incident){ 			 
  			if(err){res.json(err);}
  			else{res.json(incident);}
@@ -102,9 +107,9 @@
  	router.post('/api/incident',function(req,res,next){
 	    var incident = new Incident({
 	      title: req.body.title,
-	      longitude: req.body.longitude,
-	      latitude: req.body.latitude,
+	      loc:req.body.loc,
 	      address:req.body.address,
+	      user:req.body.user,
 	      date:getCurrentUTCDate()
 	    });
 	    incident.save(function() {	  
@@ -122,7 +127,8 @@
 				newComment.date=getCurrentUTCDateNTime(); 
 				if(updIncident.comments==undefined){
 					updIncident['comments']=[];
-				}console.log(newComment);
+				}
+				console.log(newComment);
 				updIncident['comments'].push(newComment); 
 				
 				//socket.emit('addComment',{'incident':req.params.id,'comment':newComment},function(data){});

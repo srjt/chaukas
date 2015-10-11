@@ -55,7 +55,7 @@
 		<div class="login-body"></div>		
 			<div class='container-fluid navbar navbar-default navbar-fixed-top main-nav' ng-controller="navigationCtrl" ng-show="chaukasAuth.isLogged()" > 
 				<div class="row-fluid">
-					<div class="col-xs-3">
+					<div class="col-xs-2">
 						<div class="title">
 							cha
 							<span class="logo">U
@@ -64,10 +64,12 @@
 							</span>
 							kas </span>
 							</div>
+
+
 					</div>
 
 
-					<div class="col-md-9">
+					<div class="col-md-10">
 						
 						 
 						<div class="nav-option" >
@@ -78,9 +80,10 @@
 							<span ng-hide="chaukasAuth.user.picture"  class="no-profile-pic">{{chaukasAuth.user.displayName.substr(0,1) }}</span>	
 							</a>
 						</div>
-						<div class="nav-option" ng-show="chaukasAuth.isTestUser()">
-							<a  href="#/map" ng-class="{selected:selectedNav=='map'}" ng-click="selectedNav='map'"> <i class="fa fa-globe" title="Map"></i>
-								<!-- <span > Map </span> -->
+						<div class="nav-option"  >
+							<a  href="#/map" ng-class="{selected:selectedNav=='map'}" ng-click="selectedNav='map'">
+ 								<!-- <span > Map </span> -->
+								<span ng-bind="chaukasUtils.currentCity.name" ></span><i class="fa fa-globe" title="Map"></i>
 							</a>
 						</div>
 						<div class="nav-option" ng-show="chaukasAuth.isTestUser()">

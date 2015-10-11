@@ -2,7 +2,7 @@
  	  {{incident._id}}
  	<div class="incident">
  		<div class="map-image">
-			<chaukas-map   map-center="incident" map-zoom="25" disable-info="true" add-data-point="addIncidentToMap" remove-data-point="removeIncidentFromMap"></chaukas-map>
+			<chaukas-map   map-center="incident.location" map-zoom="25" disable-info="true" add-data-point="addIncidentToMap" remove-data-point="removeIncidentFromMap"></chaukas-map>
  		</div>
  		<div class="comments">
  			 <div ><a href="#/map">Map   </a> >> <a href="{{incident.link}}" target="_blank">   {{incident.title}}</a></div>

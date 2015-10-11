@@ -1,6 +1,7 @@
-chaukas.controller('navigationCtrl',['$scope','$auth','$location','chaukasAuth',function($scope,$auth,$location,chaukasAuth){	
+chaukas.controller('navigationCtrl',['$scope','$auth','$location','chaukasAuth','chaukasUtils',function($scope,$auth,$location,chaukasAuth,chaukasUtils){	
 	
 	$scope.chaukasAuth=chaukasAuth;	
+	$scope.chaukasUtils=chaukasUtils;
 
 	function setSelctedNav(){
 		if($location.$$path.indexOf('map')>=0){
@@ -21,7 +22,7 @@ chaukas.controller('navigationCtrl',['$scope','$auth','$location','chaukasAuth',
 	};
 	setSelctedNav();
 }]);
-chaukas.controller('loginCtrl',['$scope','$auth','$location','chaukasAuth',function($scope,$auth,$location,chaukasAuth){
+chaukas.controller('loginCtrl',['$scope','$auth','$location','chaukasAuth','chaukasUtils',function($scope,$auth,$location,chaukasAuth,chaukasUtils){
 	if(chaukasAuth.isLogged()){
 		$location.path('/map');
 	}
@@ -114,7 +115,7 @@ chaukas.controller('chaukasMapCtrl',['$scope','incidentsFactory','chaukasSocket'
   	}
  	
  	$scope.init=function(){
- 		
+ 		console.log(chaukasUtils.currentCity.name);
  		var defaultBounds =new google.maps.Circle({center:  new google.maps.LatLng(28.6480367, 77.2129871), radius: 10}).getBounds();
 
 		var input = document.getElementById('searchPlace');
@@ -129,8 +130,13 @@ chaukas.controller('chaukasMapCtrl',['$scope','incidentsFactory','chaukasSocket'
     function newIncidentlocationChanged(){
     	var place = autocomplete.getPlace();	
     	$scope.newIncident.address=place.formatted_address;
-    	$scope.newIncident.latitude= place.geometry.location.lat()
-    	$scope.newIncident.longitude=place.geometry.location.lng();
+		var longLat={};
+		longLat.longitude=place.geometry.location.lng();
+    	longLat.latitude= place.geometry.location.lat()
+    	
+    	$scope.newIncident.loc.coordinates=[longLat.longitude,longLat.latitude];
+
+
     }
  
 
@@ -172,9 +178,10 @@ chaukas.controller('chaukasMapCtrl',['$scope','incidentsFactory','chaukasSocket'
     	if(typeof $scope.newIncident=='undefined'){
 			$scope.newIncident ={
 				_id:"newIncidentFakeID",
-	 			 
-	 			longitude:$scope.currentPosition.coords.longitude,
-	 			latitude:$scope.currentPosition.coords.latitude,
+	 			loc:{  
+	 				coordinates:[ $scope.currentPosition.coords.longitude,
+	 				$scope.currentPosition.coords.latitude]
+	 			},
 	 			icon:'/images/report-inc-marker.svg',
 	 			newIncident:true
 	 		};
@@ -202,8 +209,10 @@ chaukas.controller('chaukasMapCtrl',['$scope','incidentsFactory','chaukasSocket'
 			    "_id": "0001",
 			    "link": "http://timesofindia.indiatimes.com",
 			    "title": "Test Data",
-			    "longitude": 77.0290866,
-			    "latitude": 28.6890112,
+			    "location":{ 
+			    	"longitude": 77.0290866,
+			    	"latitude": 28.6890112,
+					},
 			    "date": "May 12, 2015, 01.48AM IST",
 			    "address": "Mundka, DMRC, Mundka, New Delhi, Delhi 110081, India",
 			    "comments": [
@@ -268,6 +277,7 @@ chaukas.controller('incidentCtrl',['$scope','$routeParams','incidentsFactory','c
 	$scope.currentCity= chaukasUtils.currentCity;
 	incidentsFactory.getIncidentById($routeParams._id).then(function(data){
 		$scope.incident=data.data;
+		$scope.incident.location={longitude:data.data.loc.coordinates[0], latitude:data.data.loc.coordinates[1]}
 		$scope.addIncidentToMap($scope.incident);	
 	},function(errMsg){
 		console.log(errMsg);

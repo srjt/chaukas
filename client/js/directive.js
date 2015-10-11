@@ -1,5 +1,5 @@
-chaukas.directive('chaukasMap',['$window','$document','$compile','incidentsFactory','chaukasAuth','chaukasSocket',
-	function  ($window,$document,$compile,incidentsFactory,chaukasAuth,chaukasSocket) {	
+chaukas.directive('chaukasMap',['$window','$document','$compile','incidentsFactory','chaukasAuth','chaukasSocket','chaukasUtils',
+	function  ($window,$document,$compile,incidentsFactory,chaukasAuth,chaukasSocket,chaukasUtils) {	
 	return {
 		restrict:'E',
 		template:'<div id="map-canvas" style="min-height:500px;height:100%" ></div>',
@@ -16,7 +16,7 @@ chaukas.directive('chaukasMap',['$window','$document','$compile','incidentsFacto
 		},
 		link:function(scope,element){
 			var map;
- 			var filterScope;
+ 			 
  			scope.initDateRange=1;
 			function initialize(){
 			  	var mapOptions = {
@@ -38,6 +38,29 @@ chaukas.directive('chaukasMap',['$window','$document','$compile','incidentsFacto
 				};
 			  	map = new google.maps.Map(element[0],mapOptions);		 
 
+		 		google.maps.event.addListener(map, 'idle', function() {
+						var bounds =  map.getBounds();
+						if(bounds){ 
+							var centerLat=bounds.getCenter().lat()
+							var centerLng=bounds.getCenter().lng();
+							var ne = bounds.getNorthEast();
+							var sw = bounds.getSouthWest();
+							var dist=-1;
+							if(chaukasUtils.currentCity.bounds.center.lat>=0){
+								dist=chaukasUtils.currentCity.bounds.calculateDistance(centerLat,centerLng);							
+							} 
+
+							if(dist==-1 || dist>25){ 
+								chaukasUtils.currentCity.bounds.center.lat=centerLat;
+								chaukasUtils.currentCity.bounds.center.lng=centerLng;
+								chaukasUtils.currentCity.bounds.swLng=sw.lng();
+								chaukasUtils.currentCity.bounds.swLat=sw.lat();
+								chaukasUtils.currentCity.bounds.neLng=ne.lng();
+								chaukasUtils.currentCity.bounds.neLat=ne.lat();  
+								scope.fnDateRangeChanged(scope.initDateRange,scope.startDate,scope.endDate);
+							}		   
+						}               
+		         });
 
 				//------------------PLACES------------------------			  
 				service = new google.maps.places.PlacesService(map);
@@ -84,12 +107,16 @@ chaukas.directive('chaukasMap',['$window','$document','$compile','incidentsFacto
 					filterControl.setAttributeNode(attDateRange);
 
 					scope.fnDateRangeChanged=function(dateRange,startDate,endDate){ 
+						scope.startDate=startDate;
+						scope.endDate=endDate;
+						 
 						if(dateRange!='custom'){
 							incidentsFactory.getIncidents(startDate,endDate).then(function(data){
 								scope.data=data.data;	
-								if((!scope.data || scope.data.length<=0) && scope.initDateRange<4){
-									scope.initDateRange++;
-								}					 
+								// if((!scope.data || scope.data.length<=0) && scope.initDateRange<4){
+								// 	scope.initDateRange++;
+								// }					 
+								 
 							},function(errMsg){
 								console.log(errMsg);
 							}) ;
@@ -108,17 +135,11 @@ chaukas.directive('chaukasMap',['$window','$document','$compile','incidentsFacto
 					filterControl.setAttributeNode(attDateRangeChanged);
 		  
 					filterControl.index = 1;
-
-					filterScope=scope.$new();        	 
-		        	var compiledFilterControl=$compile(filterControl)(filterScope)
+ 
+		        	var compiledFilterControl=$compile(filterControl)(scope);
 					map.controls[google.maps.ControlPosition.LEFT_TOP].push(compiledFilterControl[0]);
 				}
-
-				
 			}
-			
-		 
-			initialize();
 
 			var lstMarkers=[];
 			var marker;
@@ -175,7 +196,7 @@ chaukas.directive('chaukasMap',['$window','$document','$compile','incidentsFacto
 			
 			addMarker=function(pnt){
 				var indxMarker=-1;
- 				if(pnt && pnt.latitude && pnt.longitude	    ){   
+ 				if(pnt && pnt.loc.coordinates.length==2){   
 					if(pnt.newIncident){
 						var image = {
 						  url: pnt.icon,
@@ -186,7 +207,7 @@ chaukas.directive('chaukasMap',['$window','$document','$compile','incidentsFacto
 						};
 
 						marker = new google.maps.Marker({
-							position: new google.maps.LatLng(pnt.latitude,pnt.longitude),
+							position: new google.maps.LatLng(pnt.loc.coordinates[1],pnt.loc.coordinates[0]),
 						    map: map,
 						    title:pnt.title,
 						    icon:image,
@@ -194,20 +215,19 @@ chaukas.directive('chaukasMap',['$window','$document','$compile','incidentsFacto
 						});	
 
 						map.setZoom(25); 
-						scope.mapCenter=pnt;
+						scope.mapCenter={latitude:pnt.loc.coordinates[1],longitude:pnt.loc.coordinates[0]};
 
-						//map.setCenter(new google.maps.LatLng(pnt.latitude, pnt.longitude));
+						//map.setCenter(new google.maps.LatLng(pnt.location.latitude, pnt.location.longitude));
 					}
 					else {
 						marker = new google.maps.Marker({
-							position: new google.maps.LatLng(pnt.latitude,pnt.longitude),
+							position: new google.maps.LatLng(pnt.loc.coordinates[1] ,pnt.loc.coordinates[0]),
 						    map: map,
-						    title:pnt.title,
-						    animation: google.maps.Animation.DROP
+						    title:pnt.title
 						});	
 
 						if(pnt.moveMap){
-							scope.mapCenter=pnt;
+							scope.mapCenter={latitude:pnt.loc.coordinates[1],longitude:pnt.loc.coordinates[0]};
 						}
 					}
 					lstMarkers.push(marker);					 
@@ -231,14 +251,14 @@ chaukas.directive('chaukasMap',['$window','$document','$compile','incidentsFacto
 						        	if(pnt.link){ 
 						        		infoContent+= "  <a target='_blank' href='" + pnt.link + "'>" + pnt.title + "</a> <br/>" ;
 						        	}
-						        	else {
-						        		infoContent+=    "<b>" + pnt.title + " </b> <br/>" ;	
+						        	else { 
+						        		infoContent+= "  <a   href='#/incidents/" + pnt._id + "'>" + pnt.title + "</a> <br/>" ;						        		 	
 						        	}
-						        	infoContent += pnt.address + "</div>"
-							        infoContent +='<chaukas-comments incident=incident > </chaukas-comments>'
+						        	infoContent += pnt.address +  "</div>";
+							        infoContent +='<chaukas-comments incident=incident > </chaukas-comments>';
 							       /* infoContent += "<textarea type='text' style='width:100%' ng-model='newComment'> </textarea> "								        	
 							        infoContent += "<input type='button' value='go' ng-click='postComment(pnt)'> </input> "	*/
-						        	infoContent += " </div>"
+						        	infoContent += " </div>";
 						        							        
 									var newScope={};
 									var onload = function() {
@@ -279,7 +299,6 @@ chaukas.directive('chaukasMap',['$window','$document','$compile','incidentsFacto
 				return indxMarker;
  			}
 
-
  			removeMarker=function(indx){
  				if(indx<=lstMarkers.length-1)
  				{
@@ -289,6 +308,8 @@ chaukas.directive('chaukasMap',['$window','$document','$compile','incidentsFacto
  				return false;
  			}
 			//google.maps.event.addDomListener($window.window, 'load', initialize);
+
+			initialize();
 		},
 		controller:function($scope){
  	
@@ -390,6 +411,7 @@ chaukas.directive('chaukasComments',['$location','amMoment','incidentsFactory','
 				}
 				return '';
 			}
+
 			scope.getLocalizedDate=function(dt){			    
 			    return amMoment.applyTimezone(moment.utc(dt ), chaukasUtils.currentTimezone).format(chaukasUtils.dateTimeFormat);    			
 			};

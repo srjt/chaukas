@@ -5,16 +5,27 @@ var mongoose = require('mongoose')
  
 var incidentSchema = new Schema({    
 	title:String,
-    longitude: {type:Number , default: 0},
-    latitude: {type: Number, default:0},
+    loc:{
+        type:{
+            type:String,
+            required:true,
+            enum:['Point','Polygon'],
+            default:'Point'
+        },
+        coordinates: [{type:Number}]
+    },
     link:String,
     date:Date,
     address:String,
+    user:{type: Schema.Types.ObjectId,ref:'User'},
     comments:[{
     	date:Date,
     	comment:String,
     	user:{type: Schema.Types.ObjectId,ref:'User'}
     }]
 });
- 
+
+incidentSchema.index({ loc: '2dsphere' });
+
+
 module.exports = mongoose.model('Incident', incidentSchema,'chaukasData');
