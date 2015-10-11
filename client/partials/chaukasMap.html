@@ -9,7 +9,7 @@
 		<span>{{incidentsOnMap.length}}</span>  
 		<input type='button' ng-click="addTestData()" value="Add Test Data" />
 	</div>
-	<chaukas-map  enable-filter-control="true"  data="incidentsOnMap" map-zoom="19" current-city="currentCity"  add-data-point="addIncidentToMap"  map-center="currentCity.position" remove-data-point="removeIncidentFromMap" ></chaukas-map>
+	<chaukas-map  enable-filter-control="true"  data="incidentsOnMap" map-zoom="currentCity.mapZoomLevel" current-city="currentCity"  add-data-point="addIncidentToMap"  map-center="currentCity.position" remove-data-point="removeIncidentFromMap" ></chaukas-map>
 
 
 	<style >

@@ -148,6 +148,7 @@ chaukas.factory('chaukasUtils',[function(){
 				longitude:'',
 				latitude:''
 			},
+			mapZoomLevel:19,
 			bounds:{
 				center:{
 					lat:-1,

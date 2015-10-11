@@ -66,7 +66,9 @@ table.slider-range-inactive span{
 }
 </style>
 <div class="map-filter"   ng-mouseover="expand=true" ng-mouseleave="expand=false">
-	<div class="expand-header"  >{{data ? data.length : 0}} incidents ({{getDateRangeTitle()}})
+	<div class="expand-header"  >
+		<span ng-hide="isLoading">{{data ? data.length : 0}} incidents ({{getDateRangeTitle()}})</span>
+		<span ng-show="isLoading"> loading...</span>
 		<img class="expand" src="/images/arrow--down--gray.png"ng-hide="expand"></img>
 		<img class="expand" src="/images/arrow--up--gray.png"  ng-show="expand"></img>
 	</div>

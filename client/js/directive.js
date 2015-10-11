@@ -18,6 +18,7 @@ chaukas.directive('chaukasMap',['$window','$document','$compile','incidentsFacto
 			var map;
  			 
  			scope.initDateRange=1;
+ 			scope.loadingIncidents=false;
 			function initialize(){
 			  	var mapOptions = {
 			    	zoom: 11,
@@ -46,11 +47,13 @@ chaukas.directive('chaukasMap',['$window','$document','$compile','incidentsFacto
 							var ne = bounds.getNorthEast();
 							var sw = bounds.getSouthWest();
 							var dist=-1;
+
 							if(chaukasUtils.currentCity.bounds.center.lat>=0){
 								dist=chaukasUtils.currentCity.bounds.calculateDistance(centerLat,centerLng);							
 							} 
 
-							if(dist==-1 || dist>25){ 
+							if(dist==-1 || dist>25 || map.zoom!=chaukasUtils.currentCity.mapZoomLevel){ 
+								map.zoomControl=false;
 								chaukasUtils.currentCity.bounds.center.lat=centerLat;
 								chaukasUtils.currentCity.bounds.center.lng=centerLng;
 								chaukasUtils.currentCity.bounds.swLng=sw.lng();
@@ -106,19 +109,25 @@ chaukas.directive('chaukasMap',['$window','$document','$compile','incidentsFacto
 					attDateRange.value='initDateRange';
 					filterControl.setAttributeNode(attDateRange);
 
+					var attIsLoading=document.createAttribute('is-loading');
+					attIsLoading.value='loadingIncidents';
+					filterControl.setAttributeNode(attIsLoading);
+
 					scope.fnDateRangeChanged=function(dateRange,startDate,endDate){ 
 						scope.startDate=startDate;
 						scope.endDate=endDate;
-						 
+						scope.loadingIncidents=true; 
 						if(dateRange!='custom'){
 							incidentsFactory.getIncidents(startDate,endDate).then(function(data){
-								scope.data=data.data;	
+								scope.data=data.data;
+								scope.loadingIncidents=false;	
 								// if((!scope.data || scope.data.length<=0) && scope.initDateRange<4){
 								// 	scope.initDateRange++;
 								// }					 
 								 
 							},function(errMsg){
-								console.log(errMsg);
+								console.log(errMsg);								
+								scope.loadingIncidents=false;
 							}) ;
 						}
 						else {
@@ -225,6 +234,31 @@ chaukas.directive('chaukasMap',['$window','$document','$compile','incidentsFacto
 						    map: map,
 						    title:pnt.title
 						});	
+
+
+// 					if(pnt.viewport && pnt.loc_type=='APPROXIMATE'){
+// 						var boundryCoords = [
+// 							pnt.viewport.southwest,
+// 							pnt.viewport.northeast ,
+// 							{
+// 								lat:pnt.loc.coordinates[1],
+// 								lng:pnt.loc.coordinates[0]
+// 							} 
+// 						];
+// console.log(boundryCoords);
+// 						// Construct the polygon.
+// 						var boundry = new google.maps.Polygon({
+// 							paths: boundryCoords,
+// 							strokeColor: '#FF0000',
+// 							strokeOpacity: 0.8,
+// 							strokeWeight: 2,
+// 							fillColor: '#FF0000',
+// 							fillOpacity: 0.35
+// 						});
+// 						boundry.setMap(map);						
+// 					}   
+					
+
 
 						if(pnt.moveMap){
 							scope.mapCenter={latitude:pnt.loc.coordinates[1],longitude:pnt.loc.coordinates[0]};
@@ -452,7 +486,8 @@ chaukas.directive('filterControl',function(){
 		scope:{
 			data:'=',
 			dateRangeChanged:'&' ,
-			dateRange:'='
+			dateRange:'=',
+			isLoading:'='
 		},
 		link:function(scope,element,attrs) {
 			
