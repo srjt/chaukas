@@ -9,7 +9,15 @@
 		<span>{{incidentsOnMap.length}}</span>  
 		<input type='button' ng-click="addTestData()" value="Add Test Data" />
 	</div>
-	<chaukas-map  enable-filter-control="true"  data="incidentsOnMap" map-zoom="currentCity.mapZoomLevel" current-city="currentCity"  add-data-point="addIncidentToMap"  map-center="currentCity.position" remove-data-point="removeIncidentFromMap" ></chaukas-map>
+	<chaukas-map  	enable-filter-control="true"  
+					data="incidentsOnMap" 
+					report-incident-point="reportIncident"
+					map-zoom="currentCity.mapZoomLevel" 
+					current-city="currentCity" 
+					add-data-point="addIncidentToMap"  
+					map-center="mapCenter" 
+					remove-data-point="removeIncidentFromMap" >
+	</chaukas-map>
 
 
 	<style >
@@ -110,8 +118,10 @@
 		<div ng-show="openPanel==PANELS.report"   class="on-map-list" >
  		   
  			<div class="form-report">
- 				<div class="input-box"><input type="text" class="form-control" id="searchPlace" placeholder="Current Location"  / ></div>
+ 				<div class="input-box"><input type="text" class="form-control" id="searchPlace" placeholder="Current Location"   / ></div>
  				<div class="input-box"><input type="text" class="form-control" id="title" placeholder="Enter title" ng-model="newIncident.title" /> </div>
+ 				<div class="input-box"><textarea  rows="4" cols="50" class="form-control" id="desc" placeholder="Description" ng-model="newIncident.desc" ></textarea> </div>
+ 				
  				<div class="input-box report-btn"><button  class="btn btn-default" ng-click="reportNewIncident()">Report</button></div>
  			</div>  
 

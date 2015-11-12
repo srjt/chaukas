@@ -25,8 +25,9 @@
 		res.render('index.html');
 	});
 
-	router.get('/api/rawdata',function  (req,res) {
-		rawIncident.find(function(err,rawIncidents){
+	router.get('/api/rawdata/:city',function  (req,res) {
+
+		rawIncident.find({'city':req.params.city},function(err,rawIncidents){
 			res.json(rawIncidents);
 		});		 
 	});
@@ -57,42 +58,56 @@
 	 				}
  				}); 
 
- 	});
- 	router.get('/api/incidents/:swLng/:swLat/:neLng/:neLat',function  (req,res) {
- 		if(req.query.filter){
- 			
- 			var startDate, endDate;
+ 	});  	 	
+ 	router.get('/api/incidents',function  (req,res) { 		 		
+ 		var startDate, endDate,swLng,swLat,neLng,neLat;
+ 		if(req.query.sw){ 
+			swLng=req.query.sw.substr(0,req.query.sw.indexOf(','));
+			swLat=req.query.sw.substr(req.query.sw.indexOf(',') + 1 );
+		}
+		if(req.query.ne) {
+ 			neLng=req.query.ne.substr(0,req.query.ne.indexOf(','));
+			neLat=req.query.ne.substr(req.query.ne.indexOf(',') + 1);
+ 		}
+ 		if(req.query.filter) {	
  			startDate=req.query.filter.substr(0,req.query.filter.indexOf(','));
  			endDate=req.query.filter.substr(req.query.filter.indexOf(',') +1); 	 			 
- 
- 			console.log(startDate);
- 			console.log(endDate);
-
- 			if(isNaN(Date.parse(startDate)) || isNaN(Date.parse(endDate))){
- 				fnErrorResponse(res,'invalid request');
- 			}
- 			else { 
-				Incident.find({"date": {"$gte": new Date(startDate), "$lt": new Date(endDate)},
-								"loc":  { "$geoWithin" :{ "$box": [ [ parseFloat(  req.params.swLng),parseFloat( req.params.swLat)],
-																	[ parseFloat(req.params.neLng),parseFloat(req.params.neLat)] ] } }
-							  })
-						.populate('user')
-						.exec(function(err,incident){ 			 
-			 				if(err){
-			 					fnErrorResponse(res,  err);
-			 				}
-			 				else{
-			 					res.json(incident);
-			 				}
-		 				}); 				
- 				
- 			}
  		}
- 		else { 
- 			Incident.find().sort({address:1}).exec(function(err,incidents){
- 				 res.json(incidents);
- 			});			
+		console.log(startDate);
+		console.log(endDate);
+		console.log(swLng + ' ' + swLat + ' ' + neLng + ' ' + neLat);
+	
+		var query={};
+		if(!isNaN(Date.parse(startDate)) && !isNaN(Date.parse(endDate))){
+			query.date={
+				"$gte":new Date(startDate),
+				"$lt" : new Date(endDate)
+			}
 		}
+		if(swLng && swLng>=0 && swLat && swLat>=0 && neLng && neLng>=0 && neLat && neLat>=0){
+			query.loc={
+				"$geoWithin":{
+					"$box":[
+							[ parseFloat(  swLng),parseFloat( swLat)],
+							[ parseFloat(  neLng),parseFloat( neLat)]
+						   ]
+				}
+			}
+		}  
+
+		console.log(query);
+
+		Incident.find(query)
+				.populate('user')
+				.exec(function(err,incident){
+					if(err){ 
+						fnErrorResponse(res,err);
+					}
+					else {
+						console.log('responded');
+						res.json(incident);
+					}
+				});       		 
 	});
 
  	router.get('/api/incidents/:id',function  (req,res) {
@@ -107,7 +122,9 @@
  	router.post('/api/incident',function(req,res,next){
 	    var incident = new Incident({
 	      title: req.body.title,
+	      desc:req.body.desc,
 	      loc:req.body.loc,
+	      loc_type:'ROOFTOP',
 	      address:req.body.address,
 	      user:req.body.user,
 	      date:getCurrentUTCDate()

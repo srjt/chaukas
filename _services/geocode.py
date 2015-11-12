@@ -2,6 +2,9 @@ import re
 from pymongo import MongoClient as Connection
 from geopy import GoogleV3
 
+
+#host="mongodb://nodejsadmin:chaukas2528@ds047030.mongolab.com:47030/heroku_0q809vcs"
+#database="heroku_0q809vcs"
 host="localhost"
 database="chaukasDB"
 collectionSource="chaukasCrawledData"
@@ -27,8 +30,9 @@ def saveIncident(incident):
     if colDest is None:
         colDest=mongo_connection_dest()
 
-    if not colDest.find_one({"title":incident['title'],"latitude":incident['latitude'],"longitude":incident['longitude']}):   
+    if not colDest.find_one({"title":incident['title'],"loc.coordinates":incident['loc']['coordinates']}):   
         colDest.insert(incident)
+        print('-------SAVED------')
     else:
         print('-------EXIST------')
 
@@ -47,23 +51,30 @@ def geocodeData():
         #print(rec['title'])
         for loc in rec['locations']:
             try:
-                geoLoc=geolocator.geocode(loc + ' Delhi, India'  )
-
+                #https://developers.google.com/maps/documentation/geocoding/intro
+                geoLoc=geolocator.geocode(loc + ',' + rec['city'] + '  , India'  )              
+                 
                 if geoLoc is not None:
                     incident={}
                     incident['title']=rec['title']
                     incident['date']=rec['date_utc']
                     incident['link']=rec['uri']
+                    incident['source']=rec['source']
                     incident['address']=geoLoc.address
-                    incident['latitude']= geoLoc.latitude
-                    incident['longitude']=  geoLoc.longitude
+                    incident['viewport']=geoLoc.raw['geometry']['viewport']
+                    incident['loc_type']=geoLoc.raw['geometry']['location_type']
+                    loc={}
+                    loc['type']='Point'
+                    loc['coordinates']=[]
+                    loc['coordinates'].append(geoLoc.longitude)
+                    loc['coordinates'].append(geoLoc.latitude)
+                    incident['loc']=loc
                     saveIncident(incident)
-                    print('Loc= ' + loc)
                     print('Address= ' + geoLoc.address)
-                    print('Long= ' + str(geoLoc.longitude))
+                    print('Long = ' + str(geoLoc.longitude))
                     print('Lat= ' + str(geoLoc.latitude))
                 else:
-                    print('couldnot geo code: ' + loc)
+                    print('could not geo code: ' + loc)
             except Exception as e:
                 print('geo code Error: ' +  str(e))
         

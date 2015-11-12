@@ -11,20 +11,13 @@ import pytz
 from datetime import datetime  
 
 #baseUrl='http://timesofindia.feedsportal.com/c/33039/f/533976/index.rss'
-urlList={'http://timesofindia.indiatimes.com/city/delhi',
-         'http://timesofindia.indiatimes.com/city/delhi/2',
-         'http://timesofindia.indiatimes.com/city/delhi/3',
-         'http://timesofindia.indiatimes.com/city/delhi/4',
-         'http://timesofindia.indiatimes.com/city/delhi/5',
-         'http://timesofindia.indiatimes.com/city/delhi/6',
-         'http://timesofindia.indiatimes.com/city/delhi/7',
-         'http://timesofindia.indiatimes.com/city/delhi/8',
-         'http://timesofindia.indiatimes.com/city/delhi/9',
-         'http://timesofindia.indiatimes.com/city/delhi/10'
-         }
-baseUrl='http://timesofindia.indiatimes.com/city/delhi'
-words={'rape','raping','assault','murder' }
+cityList={'delhi','chandigarh'}
+urlList={'http://timesofindia.indiatimes.com/city/'}
+#baseUrl='http://timesofindia.indiatimes.com/city/delhi'
+words={'rape','raping','assault','murder''accident' }
 
+#host="mongodb://nodejsadmin:chaukas2528@ds047030.mongolab.com:47030/heroku_0q809vcs"
+#database="heroku_0q809vcs"
 host="localhost"
 database="chaukasDB"
 collection="chaukasCrawledData"
@@ -44,6 +37,8 @@ def mongo_connection():
     con=Connection(host)
     col=con[database][collection]
     return col
+ 
+
 
 def checkWords(text):
     matchedWords=[]
@@ -85,15 +80,23 @@ def parsePubDate(pubDate):
     if indx>-1:
         return pubDate[indx+1:].strip()
     return pubDate.strip()
+
 def convertISTToUTC(pubDate):
     pubDateUTC=''
     try:
         if pubDate is not None:
             pubDate_naive=pubDate[:-4]
-            indiaTime=pytz.timezone("Asia/Kolkata").localize(datetime.strptime(pubDate_naive,"%b %d, %Y, %I.%M%p"))
+            dateFormat="%b %d, %Y, %I.%M%p"
+            try:
+                indiaTime=pytz.timezone("Asia/Kolkata").localize(datetime.strptime(pubDate_naive,dateFormat))
+            except ValueError:
+                dateFormat="%b %d, %Y, %I.%M %p"
+                indiaTime=pytz.timezone("Asia/Kolkata").localize(datetime.strptime(pubDate_naive,dateFormat))
+
             pubDateUTC= indiaTime.astimezone(pytz.timezone("UTC"))
     except Exception as e:
-        print('Error coverting date to UTC: ' + pubDate )
+        print('Error coverting date to UTC: ' + pubDate  + ' ERROR: ' + e)
+   
     return pubDateUTC
 
 def parseStory(story):
@@ -122,7 +125,7 @@ def parseStory(story):
 
 
 
-def saveStory(matchedWords,uri,title,pubDate,mainStory):
+def saveStory(matchedWords,uri,title,pubDate,mainStory,city):
     global col
     if col is None:
         col=mongo_connection()
@@ -139,6 +142,7 @@ def saveStory(matchedWords,uri,title,pubDate,mainStory):
         story['NER_Stan']=locations
         story['locations']=remove_duplicates(locations)
         story['source']='TOI'
+        story['city']=city
         story['geocoded']=0
         print(title)
 
@@ -208,8 +212,7 @@ def processLanguageStanfordNER(text):
          
 def main():
 
-
-    
+ 
     #sample=[('doctors', 'O'), ('at', 'O'), ('Lady', 'LOCATION'), ('Hardinge', 'LOCATION'), ('Hospital', 'LOCATION'), ('on', 'O'), ('Monday.', 'O')]
     #print(get_continuous_chunksNER(sample,'LOCATION'))
     #sample=r'NEW DELHI: The Delhi high court on Tuesday refused to grant interim protection from arrest to Aam Aadmi Party MLA Jarnail Singh and gave Delhi Police a days time to file a status report in the matter. Singh has been accused of assaulting an MCD engineer and preventing him from demolishing an illegal construction in west Delhi\'s Krishna Park. Justice Sunita Gupta, while refusing interim stay from arrest, issued notice to Delhi Police asking it to file a status report and reply to Singh\'s plea seeking anticipatory bail. The court said it will go through the report and then decide on bail. Meanwhile, Delhi Police commissioner B S Bassi said on Tuesday that Singh was "absconding" and teams had been formed to locate him. "Singh\'s anticipatory bail was rejected and he is absconding. I believe he should surrender as soon as possible," he said. Singh, the AAP MLA from Tilak Nagar, moved HC after a trial court rejected his bail plea on May 2. Police said Singh had allegedly assaulted a South Corporation junior engineer, Azhar Mustafa, and prevented him from carrying out his duty when the latter and his team went to demolish an illegal construction in west Delhi on April 28. Senior advocate H S Phoolka, appearing for Singh, submitted that his client has been falsely implicated at the behest of his political rivals and this is not a case where custodial interrogation is required. During the brief arguments, Phoolka said the trial court judge rejected Singh\'s plea as he was not represented properly due to the lawyers\' strike. "No reason was given for rejecting the bail," Phoolka said, adding that the facts in the FIR were not correct. The MLA claimed that on the day of incident, he had asked the engineer for official papers sanctioning the demolition. When the officer failed to produce them, police was called. "The two complaints against the engineer were received by police," Singh\'s plea states. However, in his complaint, Mustafa claimed that when Singh was shown documents authorizing the demolition, he tore them up. Singh has been charged under On the basis of Mustaffa\'s complaint, police slapped section 186 (obstructing public servant in discharge of duty), 353 (assault or criminal force to deter public servant from discharge of his duty), 323 (punishment for voluntarily causing hurt) and 506 (punishment for criminal intimidation) of the IPC.'
@@ -218,33 +221,41 @@ def main():
     #return
 
     for url in urlList:
-        count=0
-        soup=getBSoupFromLink(url)
-        if soup is None:
-            continue
-        for section in soup.find_all("div",class_="ct1stry"):
-           for link in section.find_all("a"):
-               count=count+1
-               #print(str(count) + ' - ' + link.text)
-               if link.has_attr('href'):
-                   linkPath=link['href']
-                   linkPath=urljoin(baseUrl,linkPath);
-                   #print(linkPath)
-                   linkSoup=getBSoupFromLink(linkPath)
-                   if linkSoup is None:
-                       continue
-                   for story in linkSoup.find_all("div",{"id":"s_content"}):
-                       title,pubDate,mainStory,incompleteInfo=parseStory(story)
-                       if incompleteInfo:
-                           print('ERROR: ' + linkPath)
-                       matchedWords=checkWords(title)
-                       if not matchedWords:
-                           matchedWords=checkWords(mainStory)
-                           if matchedWords:
-                               saveStory(matchedWords,linkPath,title,pubDate,mainStory)
-                       else:
-                           saveStory(matchedWords,linkPath,title,pubDate,mainStory)
-                           
+        for city in cityList:        
+            count=0
+            
+            cityUrl=url + city
+            for pgNo in range(10):
+                urlPaged=cityUrl
+                if pgNo>0:
+                    urlPaged= cityUrl + '/' + str(pgNo)
+                print('starting URL: ' + urlPaged)
+                soup=getBSoupFromLink(urlPaged)
+                if soup is None:
+                    continue
+                for section in soup.find_all("div",class_="ct1stry"):
+                   for link in section.find_all("a"):
+                       count=count+1
+                       #print(str(count) + ' - ' + link.text)
+                       if link.has_attr('href'):
+                           linkPath=link['href']
+                           linkPath=urljoin(url,linkPath);
+                           #print(linkPath)
+                           linkSoup=getBSoupFromLink(linkPath)
+                           if linkSoup is None:
+                               continue
+                           for story in linkSoup.find_all("div",{"id":"s_content"}):
+                               title,pubDate,mainStory,incompleteInfo=parseStory(story)
+                               if incompleteInfo:
+                                   print('ERROR: ' + linkPath)
+                               matchedWords=checkWords(title)
+                               if not matchedWords:
+                                   matchedWords=checkWords(mainStory)
+                                   if matchedWords:
+                                       saveStory(matchedWords,linkPath,title,pubDate,mainStory,city)
+                               else:
+                                   saveStory(matchedWords,linkPath,title,pubDate,mainStory,city)
+                                   
             
     print('END')
 

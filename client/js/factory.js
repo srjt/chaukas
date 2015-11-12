@@ -23,8 +23,8 @@ chaukas.factory('chaukasAuth',['$window','$auth',function($window,$auth){
 chaukas.factory('rawDataFactory',['$http', function($http) {
 	var urlBase = '/api/rawdata';
 	var _rawDataService = {};
-	_rawDataService.getRawDataAll = function() {
-		return $http.get(urlBase);
+	_rawDataService.getRawDataAll = function(city) {
+		return $http.get(urlBase + '/' + city);
 	};	 
 	return _rawDataService;
 }]);
@@ -42,25 +42,45 @@ chaukas.factory('incidentsFactory',['$http','$q','chaukasAuth','chaukasUtils',fu
    		var error=function(errMsg){
    			deferred.reject(errMsg);
    		}
-		if(startDate && endDate && chaukasUtils.currentCity && chaukasUtils.currentCity.bounds){
-			$http.get(urlBase +  'incidents/'+ chaukasUtils.currentCity.bounds.swLng +'/' + chaukasUtils.currentCity.bounds.swLat + '/'
-											 + chaukasUtils.currentCity.bounds.neLng + '/' + chaukasUtils.currentCity.bounds.neLat  
-											 + '?filter=' + startDate.toISOString() + ',' + endDate.toISOString()   ).then(success,error);
+		if(startDate && endDate ){
+			$http.get(urlBase +  'incidents?sw='+ chaukasUtils.currentCity.bounds.swLng +',' + chaukasUtils.currentCity.bounds.swLat  
+											 + '&ne=' + chaukasUtils.currentCity.bounds.neLng + ',' + chaukasUtils.currentCity.bounds.neLat  
+											 + '&filter=' + startDate.toISOString() + ',' + endDate.toISOString()   ).then(success,error);
 		}   			
 		else{ 
 			console.error('could not get incidents list');
+		} 
+		return deferred.promise;
+	},
+	_incidentDataService.getIncidentsByCity=function(city){
+
+		var swLng,swLat,neLng,neLat;
+		if(city=='chandigarh'){
+			neLat=30.772427624719178;
+			neLng=77.0013542621582;
+			swLat=30.62482216605733;
+			swLng=76.53821186713867;
 		}
-   		/*if(dateRange){   		 
-   			if(startDate && endDate){
-   				$http.get(urlBase +  'incidents?filter=' + startDate + ',' + endDate   ).then(success,error);
-   			}   			
-   			else{ 
-	   			var	filter='?filter=' + dateRange;
-	   			$http.get(urlBase +   'incidents' + filter ).then(success,error);
-   			}
-   		} else { 
-			$http.get(urlBase +   'incidents'  ).then(success,error);
-		}*/
+		else if(city=='delhi'){
+			neLat=28.935961386848007;
+			neLng=78.09020237617187;
+			swLat=28.333301537709808;
+			swLng=76.23763279609375;
+		}
+		var deferred = $q.defer(); 
+   		var success=function(data){
+  			deferred.resolve(data);   			
+   		};
+
+   		var error=function(errMsg){
+   			deferred.reject(errMsg);
+   		}
+		if(city ){
+			$http.get(urlBase +  'incidents?sw='+  swLng + ',' + swLat + '&ne=' + neLng + ',' + neLat).then(success,error);
+		}   			
+		else{ 
+			console.error('could not get incidents list by city');
+		} 
 		return deferred.promise;
 	},
 	_incidentDataService.getIncidentById=function(id){
@@ -74,8 +94,7 @@ chaukas.factory('incidentsFactory',['$http','$q','chaukasAuth','chaukasUtils',fu
    			deferred.reject(errMsg);
    		}
 		$http.get(urlBase +  'incidents/'+ id).then(success,error);
-		return deferred.promise;
-	
+		return deferred.promise;	
 	},
 	_incidentDataService.postComment=function(incidentId,comment){
 		//console.log(incidentId +"/" + comment);
@@ -90,7 +109,6 @@ chaukas.factory('incidentsFactory',['$http','$q','chaukasAuth','chaukasUtils',fu
 		$http.post(urlBase+'incident/' + incidentId,{"user":chaukasAuth.user,"comment":comment }).success(success).error(error);
 		return deferred.promise;
 	}
-
 	_incidentDataService.postIncident=function(incident){
 		var deferred=$q.defer();
 		var success=function(data){

@@ -1,5 +1,8 @@
-<div>
+<div style="padding:5px 0;margin-top:35px">
 	<span>Total: {{rawData.length}}</span>
+
+<input type="radio" value="delhi" ng-model="city" ng-change="loadData()">Delhi</input>
+<input type="radio" value="chandigarh" ng-model="city" ng-change="loadData()">Chandigarh</input>
 	<table class="table">
 		<tr>
 			<th>ID</th>
@@ -7,7 +10,8 @@
 			<th>UTC</th>
 			<th>Words</th>			
 			<th>NER</th>
-			<th>Locations</th>			
+			<th>Locations</th>
+			<th>Area</th>			
 			<th>LINK</th>
 		</tr>
 		<tr ng-repeat="data in rawData | orderBy: 'data.date'" style="max-height:250px">
@@ -28,10 +32,12 @@
  		</td>
  		<td> 
 			<ul ng-repeat="entity in data.locations track by $index">
-			<a target="_blank" href="https://www.google.com/maps/place/{{entity}}+Delhi+India">{{entity}}</a>
+			<a target="_blank" href="https://www.google.com/maps/place/{{entity}} , {{data.area}} , India">{{entity}}</a>
 			</ul>
  		</td>
+		<td>	 {{data.area}}  </td>
 		<td>	<a target="_blank" href="{{data.uri}}">{{data.title}}</a> </td>
+
 		<td>
 			<input type="checkbox" ng-model="readNews" value="Read" />
 			<div ng-show="readNews">{{data.news}}</div>

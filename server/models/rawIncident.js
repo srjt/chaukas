@@ -12,7 +12,8 @@ var rawIncidentSchema = new Schema({
     geocoded:Boolean,
     address:String,
     source:String,
-    words:Array
+    words:Array,
+    city:String
 });
  
 module.exports = mongoose.model('RawIncident', rawIncidentSchema,'chaukasCrawledData');

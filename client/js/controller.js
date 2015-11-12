@@ -73,9 +73,14 @@ chaukas.controller('signupCtrl',['$scope','$auth','$location','chaukasAuth',func
 }]);
 chaukas.controller('rawDataCtrl',[ '$scope','rawDataFactory',function  ($scope,rawDataFactory) {
 	$scope.rawData=[]; 
-	rawDataFactory.getRawDataAll().then(function  (data) {
+		 
+	$scope.loadData=function(){  
+		rawDataFactory.getRawDataAll($scope.city).then(function  (data) {
 		$scope.rawData=data.data;
-	});	 
+	});
+	}
+	$scope.loadData();
+
 }]);
 chaukas.controller('chaukasMapCtrl',['$scope','incidentsFactory','chaukasSocket','chaukasUtils',function($scope,incidentsFactory,chaukasSocket,chaukasUtils){
 	//$scope.incidents=[];
@@ -99,6 +104,9 @@ chaukas.controller('chaukasMapCtrl',['$scope','incidentsFactory','chaukasSocket'
     var autocomplete;
 	if (navigator.geolocation) {
 	    navigator.geolocation.getCurrentPosition(function(position){
+	    	console.log('position');
+
+	    	console.log(position);
 	      $scope.$apply(function(){
 	        $scope.currentPosition = position;
 	      });
@@ -108,7 +116,7 @@ chaukas.controller('chaukasMapCtrl',['$scope','incidentsFactory','chaukasSocket'
 	      };
 	      var circle = new google.maps.Circle({
 	        center: geolocation,
-	        radius: 10//position.coords.accuracy
+	        radius: 50//position.coords.accuracy
 	      });
 	      autocomplete.setBounds(circle.getBounds());
 	    });
@@ -124,22 +132,21 @@ chaukas.controller('chaukasMapCtrl',['$scope','incidentsFactory','chaukasSocket'
 		  types: ['establishment','geocode']
 		};
 		autocomplete = new google.maps.places.Autocomplete(input, options); 
-		autocomplete.addListener('place_changed', newIncidentlocationChanged);		 
+		autocomplete.addListener('place_changed', newIncidentlocationChanged);		
+		$scope.mapCenter=chaukasUtils.currentCity.position;
  	};
     
     function newIncidentlocationChanged(){
-    	var place = autocomplete.getPlace();	
-    	$scope.newIncident.address=place.formatted_address;
-		var longLat={};
-		longLat.longitude=place.geometry.location.lng();
-    	longLat.latitude= place.geometry.location.lat()
-    	
-    	$scope.newIncident.loc.coordinates=[longLat.longitude,longLat.latitude];
+    	var place = autocomplete.getPlace();
 
-
+    	$scope.$apply(function(){
+    		if(!$scope.reportIncident){
+    			$scope.reportIncident=getNewIncident();
+    		}
+    		$scope.reportIncident.address=place.formatted_address;
+    		$scope.reportIncident.loc.coordinates=[place.geometry.location.lng(),place.geometry.location.lat()];    		
+    	}());
     }
- 
-
     $scope.getPanelState=function(panel){  
     	var cls='';  	 
     	if($scope.openPanel){ 
@@ -158,10 +165,15 @@ chaukas.controller('chaukasMapCtrl',['$scope','incidentsFactory','chaukasSocket'
 	} 
     $scope.onPanelClick=function(panel){
     	if(!$scope.closingPanel){
-			$scope.openPanel=panel; 
-			if(panel==$scope.PANELS.report){				
-				addNewIncident();	
+			if($scope.openPanel!=panel){ 
+				if(panel==$scope.PANELS.report){				
+					addNewIncident();	
+				}
+				else{
+					removeNewIncident();
+				}
 			}
+			$scope.openPanel=panel; 
 		}
 		else {
 			$scope.openPanel=null;	
@@ -181,7 +193,7 @@ chaukas.controller('chaukasMapCtrl',['$scope','incidentsFactory','chaukasSocket'
 	 			loc:{  
 	 				coordinates:[ $scope.currentPosition.coords.longitude,
 	 				$scope.currentPosition.coords.latitude]
-	 			},
+	 			}, 
 	 			icon:'/images/report-inc-marker.svg',
 	 			newIncident:true
 	 		};
@@ -189,48 +201,23 @@ chaukas.controller('chaukasMapCtrl',['$scope','incidentsFactory','chaukasSocket'
 		return $scope.newIncident;
     }
     function addNewIncident(){
-    	addToMap(getNewIncident());
+    	$scope.reportIncident=getNewIncident(); 
     }
-    function removeNewIncident(){
-    	removeFromMap($scope.newIncident);
-    	$scope.currentPosition.title='';
-		delete $scope.newIncident ;
+    function removeNewIncident(){   
+    	$scope.reportIncident=null;
+    	if($scope.newIncident){ 
+    		$scope.newIncident.title=''; 	
+    		$scope.newIncident.desc='';
+    	} 
     }
- 	$scope.reportNewIncident=function(){
- 	 
+ 	$scope.reportNewIncident=function(){ 	 
  		incidentsFactory.postIncident($scope.newIncident).then(function(data){			
-			removeNewIncident();
+			 removeNewIncident();
 		},function(errMsg){
 			console.log(errMsg);
 		});	
  	};
-    $scope.addTestData=function(){
-	    var testData=	{
-			    "_id": "0001",
-			    "link": "http://timesofindia.indiatimes.com",
-			    "title": "Test Data",
-			    "location":{ 
-			    	"longitude": 77.0290866,
-			    	"latitude": 28.6890112,
-					},
-			    "date": "May 12, 2015, 01.48AM IST",
-			    "address": "Mundka, DMRC, Mundka, New Delhi, Delhi 110081, India",
-			    "comments": [
-			        {
-			        	"username":"srjt",
-			            "comment": "What the hell!",
-			            "date": "2015-06-02 04:15:29"
-			        }
-			    ]
-			};
-
-		function dataAdded(data){
-			 var args = arguments;
-			// $scope.addToMap(data);
-		}
  
-		chaukasSocket.emit('addIncident',testData,dataAdded);
-	}
 	function addToMap(data){
 		if(!data.onMap){
 			data.onMap=true;
@@ -250,7 +237,7 @@ chaukas.controller('chaukasMapCtrl',['$scope','incidentsFactory','chaukasSocket'
 			data.onMap=false;
 			var ret=$scope.removeIncidentFromMap(data);
 			if(!ret){
-				console.log('here');
+				console.log('Could not remove data point from map');
 			}
 		}
 	}
@@ -264,12 +251,16 @@ chaukas.controller('chaukasMapCtrl',['$scope','incidentsFactory','chaukasSocket'
 	$scope.init();
 }]);
 chaukas.controller('chaukasListCtrl',['$scope','incidentsFactory','chaukasSocket',function($scope,incidentsFactory,chaukasSocket){
-	incidentsFactory.getIncidents().then(function(data){
-		$scope.incidents=data.data;
-	 
-	},function(errMsg){
-		console.log(errMsg);
-	}) ;
+	
+	$scope.loadData=function(){  
+		incidentsFactory.getIncidentsByCity($scope.city).then(function(data){
+			$scope.incidents=data.data;
+		 
+		},function(errMsg){
+			console.log(errMsg);
+		});
+	}
+	$scope.loadData();
 }]);
 
 chaukas.controller('incidentCtrl',['$scope','$routeParams','incidentsFactory','chaukasSocket','chaukasUtils',function($scope,$routeParams,incidentsFactory,chaukasSocket,chaukasUtils){

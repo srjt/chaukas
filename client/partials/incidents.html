@@ -1,13 +1,18 @@
-Total {{incidents.length}}
-<table class="table" ng-hide="hideList" style="padding:5px 0" >
+<div style="padding:5px 0;margin-top:35px">
+
+<span>Total {{incidents.length}}</span>
+
+<input type="radio" value="delhi" ng-model="city" ng-change="loadData()">Delhi</input>
+<input type="radio" value="chandigarh" ng-model="city" ng-change="loadData()">Chandigarh</input>
+<table class="table" ng-hide="hideList"  >
 		<tr>
 			<th>ID</th>
 			<th>Date</th>
 			<th>Title</th>			
 			<th>Address</th>
 			<th>Lat N Long</th>			
-			 			
-			 
+			<th>Viewport</th>
+			<th>Location Type</th> 
 		</tr>
 		<tr ng-repeat="data in incidents " style="max-height:250px">
 		<td> 
@@ -25,8 +30,12 @@ Total {{incidents.length}}
 			 
  		</td>
  		<td> 
-			 {{data.latitude}},{{data.longitude}}
+			 {{data.loc.coordinates[1]}},{{data.loc.coordinates[0]}}
 		</td>
-		  
+		<td>
+			{{data.viewport}}
+		</td>  
+		<td>{{data.loc_type}}</td>
 		</tr>
 	</table>
+</div>

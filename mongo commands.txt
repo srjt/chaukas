@@ -1,0 +1,1 @@
+db.chaukasCrawledData.update({},{$set:{city:'delhi'}},{multi:true})

@@ -1,3 +1,8 @@
+<style>
+.incident-desc{
+	 
+}
+</style>
 <div class='cmnts' style="padding:5px 0;margin-top:50px" >
  	  {{incident._id}}
  	<div class="incident">
@@ -6,6 +11,7 @@
  		</div>
  		<div class="comments">
  			 <div ><a href="#/map">Map   </a> >> <a href="{{incident.link}}" target="_blank">   {{incident.title}}</a></div>
+ 			 <div class="incident-desc" ng-bind="incident.desc"></div>
  			<chaukas-comments incident="incident"   max-comments="10" full-page="true"> </chaukas-comments>	
  		</div>
  	<div> 

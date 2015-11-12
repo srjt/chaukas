@@ -5,6 +5,7 @@ var mongoose = require('mongoose')
  
 var incidentSchema = new Schema({    
 	title:String,
+    desc:String,
     loc:{
         type:{
             type:String,
@@ -14,6 +15,17 @@ var incidentSchema = new Schema({
         },
         coordinates: [{type:Number}]
     },
+    loc_type:String,
+    viewport:{
+        northeast:{
+            lat:Number,
+            lng:Number
+        },
+        southwest:{
+            lat:Number,
+            lng:Number
+        }
+    },    
     link:String,
     date:Date,
     address:String,
