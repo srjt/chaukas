@@ -152,9 +152,8 @@ chaukas.factory('chaukasSocket', ['$rootScope',function ($rootScope) {
     	}
   };
 }]);
-chaukas.factory('chaukasUtils',[function(){
-	var utilsInstance=	  {
-		
+chaukas.factory('chaukasUtils',['$http','$q',function($http,$q){
+	var utilsInstance=	  {		
 		//TODO: this should be based on location of map
 		dateTimeFormat: 'MMM DD, YYYY HH:mm:ss A',		 
 		currentTimezone:'Asia/Calcutta',
@@ -222,6 +221,20 @@ chaukas.factory('chaukasUtils',[function(){
 					console.log('errrrrrrrrrrrrrrr');
 				});
 			}
+		},
+		fetchLinkInfo:function(lnk){
+			var urlBase='/api/';
+			var deferred = $q.defer();   
+	   		
+	   		var success=function(data){
+	  			deferred.resolve(data.data);   			
+	   		};
+
+	   		var error=function(errMsg){
+	   			deferred.reject(errMsg);
+	   		}
+	   		$http.get(urlBase + 'utils/linkinfo?lnk='+ lnk).then(success,error);
+	   		return deferred.promise;				
 		} 
 	};
 

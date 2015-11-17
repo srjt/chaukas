@@ -206,6 +206,7 @@ chaukas.controller('chaukasMapCtrl',['$scope','incidentsFactory','chaukasSocket'
     function removeNewIncident(){   
     	$scope.reportIncident=null;
     	if($scope.newIncident){ 
+    		$scope.newIncident.link='';
     		$scope.newIncident.title=''; 	
     		$scope.newIncident.desc='';
     	} 
@@ -218,6 +219,18 @@ chaukas.controller('chaukasMapCtrl',['$scope','incidentsFactory','chaukasSocket'
 		});	
  	};
  
+ 	$scope.fetchLinkInfo=function(){
+ 		$scope.newIncident.title= $scope.newIncident.desc='loading...';
+ 		
+ 		chaukasUtils.fetchLinkInfo($scope.newIncident.link).then(function(data){
+ 			$scope.newIncident.title=data.title;
+ 			$scope.newIncident.desc=data.description;
+
+ 		},function(errMsg){
+ 			$scope.newIncident.title= $scope.newIncident.desc='';
+ 		});
+ 	};
+
 	function addToMap(data){
 		if(!data.onMap){
 			data.onMap=true;
