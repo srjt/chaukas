@@ -11,17 +11,16 @@
    		moment = require('moment'),
    		config = require('../config'),
 		request = require('request'),
-		//metaInspector=require('node-metainspector'),
+		metaInspector=require('node-metainspector'),
 		
 		User = require('../models/user.js'),
 		Incident = require('../models/incident.js'),
 		rawIncident = require('../models/rawIncident.js'),
 		
-		socketClient = require("socket.io-client"),
-		socket=socketClient.connect(process.env.SERVER_URI ||  'http://localhost:3000');
+		socketClient = require("socket.io-client");
 
 	mongoose.connect(process.env.MONGOLAB_URI || 'mongodb://localhost/chaukasDB');
-	
+	socket=socketClient.connect(process.env.SERVER_URI ||  'http://localhost:3000');
 
  	router.get('/',function  (req,res) {
 		res.render('index.html');
@@ -287,7 +286,7 @@
 	  	});
 	});
 
-	/*router.get('/api/utils/linkinfo',function(req,res){		
+	router.get('/api/utils/linkinfo',function(req,res){		
 		var client = new metaInspector(req.query.lnk, { timeout: 5000 });
 		client.on("fetch", function(){ 			
  			res.json({
@@ -300,7 +299,7 @@
 		});
 
 		client.fetch();
-	});*/
+	});
 
 	function createJWT(user) {
 		var payload = {
