@@ -110,6 +110,34 @@
 		.report-btn {
 			float: left;
 		}
+		.divider-hr{
+			position: relative;
+		}
+		.divider-hr:before{
+			left:5%;
+			right: 45%;
+		}
+		.divider-hr:after{
+			left: 55%;
+			right: 95%;
+		}
+		.divider-hr:before,.divider-hr:after{			
+			border: 1px solid lightgray;
+			content: '';
+			position:absolute;
+			top:50%;
+			width: 40%;
+		}
+		div.current-location{
+			position: relative;
+		}
+		img.current-location{
+			position: absolute;
+			right: 5%;
+			top:5px;
+			width: 24px;
+
+		}
 	</style>
 
 	<div class="on-map-panel right first" ng-class="getPanelState(PANELS.report)" ng-click="onPanelClick(PANELS.report)">
@@ -118,8 +146,12 @@
 		<div ng-show="openPanel==PANELS.report"   class="on-map-list" >
  		   
  			<div class="form-report">
- 				<div class="input-box"><input type="text" class="form-control" id="searchPlace" placeholder="Current Location"   / ></div>
+ 				<div class="input-box current-location">
+ 					<img class="current-location"  src="/images/Current_location.png"  ng-click="selectToCurrentLocation()"> </img>
+ 					<input type="text" class="form-control" id="searchPlace" placeholder="Current Location"  ng-model="newIncident.autoCompletePlace" / >
+ 				</div>
  				<div class="input-box"><input type="text" class="form-control" id="title" placeholder="Enter news link" ng-model="newIncident.link" ng-blur="fetchLinkInfo()" /> </div>
+ 				<div class="divider-hr">or</div>
  				<div class="input-box"><input type="text" class="form-control" id="title" placeholder="Enter title" ng-model="newIncident.title" /> </div>
  				<div class="input-box"><textarea  rows="4" cols="50" class="form-control" id="desc" placeholder="Description" ng-model="newIncident.desc" ></textarea> </div>
  				

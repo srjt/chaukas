@@ -102,25 +102,7 @@ chaukas.controller('chaukasMapCtrl',['$scope','incidentsFactory','chaukasSocket'
 
 
     var autocomplete;
-	if (navigator.geolocation) {
-	    navigator.geolocation.getCurrentPosition(function(position){
-	    	console.log('position');
 
-	    	console.log(position);
-	      $scope.$apply(function(){
-	        $scope.currentPosition = position;
-	      });
-	      var geolocation = {
-	        lat: position.coords.latitude,
-	        lng: position.coords.longitude
-	      };
-	      var circle = new google.maps.Circle({
-	        center: geolocation,
-	        radius: 50//position.coords.accuracy
-	      });
-	      autocomplete.setBounds(circle.getBounds());
-	    });
-  	}
  	
  	$scope.init=function(){
  		console.log(chaukasUtils.currentCity.name);
@@ -225,12 +207,20 @@ chaukas.controller('chaukasMapCtrl',['$scope','incidentsFactory','chaukasSocket'
  		chaukasUtils.fetchLinkInfo($scope.newIncident.link).then(function(data){
  			$scope.newIncident.title=data.title;
  			$scope.newIncident.desc=data.description;
-
  		},function(errMsg){
  			$scope.newIncident.title= $scope.newIncident.desc='';
  		});
  	};
+ 	$scope.selectToCurrentLocation=function(){
+ 		$scope.getCurrentLocation();
+ 		var inc=getNewIncident();
+ 		inc.loc={ 			
+			coordinates:[ $scope.currentPosition.coords.longitude,
+			$scope.currentPosition.coords.latitude]
+ 		}
+ 		inc.autoCompletePlace='';
 
+ 	}
 	function addToMap(data){
 		if(!data.onMap){
 			data.onMap=true;
@@ -242,9 +232,7 @@ chaukas.controller('chaukasMapCtrl',['$scope','incidentsFactory','chaukasSocket'
 		for (var i = 0; i < $scope.incidents.length; i++) {	
 			$scope.addToMap($scope.incidents[i]);
 		};
-	};
-
-	
+	};	
 	function removeFromMap(data){
 		if(data.onMap) {
 			data.onMap=false;
@@ -254,13 +242,33 @@ chaukas.controller('chaukasMapCtrl',['$scope','incidentsFactory','chaukasSocket'
 			}
 		}
 	}
-
 	$scope.removeAllFromMap=function(){
 		for (var i = 0; i < $scope.incidents.length; i++) {
 			$scope.removeFromMap($scope.incidents[i]);
 		};
 	};
+	$scope.getCurrentLocation=function(){
+		if (navigator.geolocation) {
+		    navigator.geolocation.getCurrentPosition(function(position){
+		    	console.log('position');
 
+		    	console.log(position);
+		      $scope.$apply(function(){
+		        $scope.currentPosition = position;
+		      });
+		      var geolocation = {
+		        lat: position.coords.latitude,
+		        lng: position.coords.longitude
+		      };
+		      var circle = new google.maps.Circle({
+		        center: geolocation,
+		        radius: 50//position.coords.accuracy
+		      });
+		      autocomplete.setBounds(circle.getBounds());
+		    });
+	  	}
+ 	};
+	$scope.getCurrentLocation();
 	$scope.init();
 }]);
 chaukas.controller('chaukasListCtrl',['$scope','incidentsFactory','chaukasSocket',function($scope,incidentsFactory,chaukasSocket){
