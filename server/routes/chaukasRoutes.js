@@ -8,7 +8,8 @@
    		jwt = require('jwt-simple'),
    		moment = require('moment'),
    		config = require('../config'),
-		request = require('request'); 
+		request = require('request'),
+		metaInspector=require('node-metainspector');	 
 		
 	mongoose.connect(process.env.MONGOLAB_URI || 'mongodb://localhost/chaukasDB');
 	var User = require('../models/user.js');
