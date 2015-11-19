@@ -8,11 +8,11 @@ module.exports=function(server){
 			// https://devcenter.heroku.com/articles/using-socket-io-with-node-js-on-heroku
 			
 			io.set('transports', ['websocket', 
-      'flashsocket', 
-      'htmlfile', 
-      'xhr-polling', 
-      'jsonp-polling', 
-      'polling']);
+							      'flashsocket', 
+							      'htmlfile', 
+							      'xhr-polling', 
+							      'jsonp-polling', 
+							      'polling']);
   			//io.set("polling duration", 1);
 		    
 		    socket.emit('message', { message: 'welcome to the chaukas' });
