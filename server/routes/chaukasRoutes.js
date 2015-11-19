@@ -1,27 +1,23 @@
 (function  () {
 	'use strict';
 	var express=require('express'),
-		router=express.Router(),
-
+		router=express.Router(),		
 		mongoose=require('mongoose'),		
 		Schema = mongoose.Schema,
    		ObjectId = Schema.ObjectId,
-
    		jwt = require('jwt-simple'),
    		moment = require('moment'),
    		config = require('../config'),
-		request = require('request'),
-		metaInspector=require('node-metainspector');		
-		
+		request = require('request'); 
 		
 	mongoose.connect(process.env.MONGOLAB_URI || 'mongodb://localhost/chaukasDB');
-	
-	var User = require('../models/user.js'),
-		Incident = require('../models/incident.js'),
-		rawIncident = require('../models/rawIncident.js');
+	var User = require('../models/user.js');
+	var Incident = require('../models/incident.js');
+	var rawIncident = require('../models/rawIncident.js');
 
-	var socketClient = require("socket.io-client"),	
-		socket=socketClient.connect(process.env.SERVER_URI ||  'http://localhost:3000');
+	var socketClient = require("socket.io-client");
+	var	socket=socketClient.connect(process.env.SERVER_URI ||  'http://localhost:3000');
+ 	 
 
  	router.get('/',function  (req,res) {
 		res.render('index.html');
