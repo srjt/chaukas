@@ -67,6 +67,7 @@ chaukas.factory('incidentsFactory',['$http','$q','chaukasAuth','chaukasUtils',fu
 			swLat=28.333301537709808;
 			swLng=76.23763279609375;
 		}
+		
 		var deferred = $q.defer(); 
    		var success=function(data){
   			deferred.resolve(data);   			
@@ -118,6 +119,7 @@ chaukas.factory('incidentsFactory',['$http','$q','chaukasAuth','chaukasUtils',fu
 			deferred.reject(errMsg);
 		};
 		incident.user=chaukasAuth.user;
+		incident.currentPosition=chaukasUtils.currentCity.position;
 		$http.post(urlBase+'incident' ,incident).success(success).error(error);
 		return deferred.promise;
 	};

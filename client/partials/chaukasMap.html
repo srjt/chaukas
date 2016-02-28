@@ -128,6 +128,10 @@
 			top:50%;
 			width: 40%;
 		}
+		.error-msg{
+			color: red;
+			font-size:smaller;
+		}
 		div.current-location{
 			position: relative;
 		}
@@ -151,11 +155,12 @@
  					<input type="text" class="form-control" id="searchPlace" placeholder="Current Location"  ng-model="newIncident.autoCompletePlace" / >
  				</div>
  				<div class="input-box"><input type="text" class="form-control" id="title" placeholder="Enter news link" ng-model="newIncident.link" ng-blur="fetchLinkInfo()" /> </div>
+ 				<div class="error-msg" ng-bind="reportIncidentError"></div>
  				<div class="divider-hr">or</div>
  				<div class="input-box"><input type="text" class="form-control" id="title" placeholder="Enter title" ng-model="newIncident.title" /> </div>
  				<div class="input-box"><textarea  rows="4" cols="50" class="form-control" id="desc" placeholder="Description" ng-model="newIncident.desc" ></textarea> </div>
  				
- 				<div class="input-box report-btn"><button  class="btn btn-default" ng-click="reportNewIncident()">Report</button></div>
+ 				<div class="input-box report-btn"><button  class="btn btn-default" ng-click="reportNewIncident()" ng-disabled="newIncident.title==LOADINGMSG" >Report</button></div>
  			</div>  
 
 			 

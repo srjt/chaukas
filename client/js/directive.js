@@ -285,7 +285,7 @@ chaukas.directive('chaukasMap',['$window','$document','$compile','incidentsFacto
 					        	scope.pnt=pnt;
 					        	var markerId='chaukasMarker_' + pnt._id;
 					        	var infoContent= "<div style='' id='"+ markerId +"''>  "  ;
-					        	infoContent +="<div style='width:50px;height:50px;float:left;margin-right:10px;border:1px solid lightgray'>News PIC</div>";
+					        	//infoContent +="<div style='width:50px;height:50px;float:left;margin-right:10px;border:1px solid lightgray'>News PIC</div>";
 					        	infoContent+= " <div> ";
 					        	if(pnt.link){ 
 					        		infoContent+= "  <a target='_blank' href='" + pnt.link + "'>" + pnt.title + "</a> <br/>" ;

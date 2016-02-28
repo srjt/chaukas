@@ -73,9 +73,9 @@ chaukas.controller('signupCtrl',['$scope','$auth','$location','chaukasAuth',func
 }]);
 chaukas.controller('rawDataCtrl',[ '$scope','rawDataFactory',function  ($scope,rawDataFactory) {
 	$scope.rawData=[]; 
-		 
+	$scope.cityList=['bathinda','mumbai','delhi','noida','gurgaon','chandigarh','ludhiana','amritsar']	 
 	$scope.loadData=function(){  
-		rawDataFactory.getRawDataAll($scope.city).then(function  (data) {
+		rawDataFactory.getRawDataAll($scope.selectedCity	).then(function  (data) {
 		$scope.rawData=data.data;
 	});
 	}
@@ -85,6 +85,7 @@ chaukas.controller('rawDataCtrl',[ '$scope','rawDataFactory',function  ($scope,r
 chaukas.controller('chaukasMapCtrl',['$scope','incidentsFactory','chaukasSocket','chaukasUtils',function($scope,incidentsFactory,chaukasSocket,chaukasUtils){
 	//$scope.incidents=[];
 	$scope.incidentsOnMap=[];
+	$scope.LOADINGMSG='loading...';
 	$scope.currentCity=chaukasUtils.currentCity;
 	$scope.PANELS={
 		list:1,
@@ -197,29 +198,33 @@ chaukas.controller('chaukasMapCtrl',['$scope','incidentsFactory','chaukasSocket'
  		incidentsFactory.postIncident($scope.newIncident).then(function(data){			
 			 removeNewIncident();
 		},function(errMsg){
-			console.log(errMsg);
+			$scope.reportIncidentError=errMsg.error;
+ 
 		});	
  	};
  
  	$scope.fetchLinkInfo=function(){
- 		$scope.newIncident.title= $scope.newIncident.desc='loading...';
- 		
- 		chaukasUtils.fetchLinkInfo($scope.newIncident.link).then(function(data){
- 			$scope.newIncident.title=data.title;
- 			$scope.newIncident.desc=data.description;
- 		},function(errMsg){
- 			$scope.newIncident.title= $scope.newIncident.desc='';
- 		});
+ 		if($scope.newIncident.link && $scope.newIncident.link.length>0){ 
+	 		$scope.newIncident.title= $scope.newIncident.desc=$scope.LOADINGMSG ;
+	 		
+	 		chaukasUtils.fetchLinkInfo($scope.newIncident.link).then(function(data){
+	 			$scope.newIncident.title=data.title;
+	 			$scope.newIncident.desc=data.description;
+	 		},function(errMsg){
+	 			$scope.newIncident.title= $scope.newIncident.desc='';
+	 		});
+ 		}
  	};
  	$scope.selectToCurrentLocation=function(){
  		$scope.getCurrentLocation();
+
  		var inc=getNewIncident();
  		inc.loc={ 			
 			coordinates:[ $scope.currentPosition.coords.longitude,
 			$scope.currentPosition.coords.latitude]
  		}
  		inc.autoCompletePlace='';
-
+ 		 console.log(inc);
  	}
 	function addToMap(data){
 		if(!data.onMap){
@@ -284,8 +289,7 @@ chaukas.controller('chaukasListCtrl',['$scope','incidentsFactory','chaukasSocket
 	$scope.loadData();
 }]);
 
-chaukas.controller('incidentCtrl',['$scope','$routeParams','incidentsFactory','chaukasSocket','chaukasUtils',function($scope,$routeParams,incidentsFactory,chaukasSocket,chaukasUtils){
-	 
+chaukas.controller('incidentCtrl',['$scope','$routeParams','incidentsFactory','chaukasSocket','chaukasUtils',function($scope,$routeParams,incidentsFactory,chaukasSocket,chaukasUtils){ 
 	$scope.currentCity= chaukasUtils.currentCity;
 	incidentsFactory.getIncidentById($routeParams._id).then(function(data){
 		$scope.incident=data.data;

@@ -1,8 +1,11 @@
 <div style="padding:5px 0;margin-top:35px">
 	<span>Total: {{rawData.length}}</span>
 
-<input type="radio" value="delhi" ng-model="city" ng-change="loadData()">Delhi</input>
-<input type="radio" value="chandigarh" ng-model="city" ng-change="loadData()">Chandigarh</input>
+	<label ng-repeat="city in cityList">
+		&nbsp;
+	<input type="radio" ng-value="city" ng-model="$parent.selectedCity" ng-change="loadData()" name="{{city}}" ></input>{{city}}
+	</label>
+
 	<table class="table">
 		<tr>
 			<th>ID</th>

@@ -78,10 +78,18 @@
 			}
 		}  
 
+ 
+// query.desc={
+// 	$exists:true 
+// }
 		console.log(query);
 
 		Incident.find(query)
+				//.limit(1)
 				.populate('user')
+				.slice('comments',5)
+				.populate('comments.user')
+
 				.exec(function(err,incident){
 					if(err){ 
 						fnErrorResponse(res,err);
@@ -111,10 +119,19 @@
 			user:req.body.user,
 			date:getCurrentUTCDate()
 	    });
-	    incident.save(function() {	  
-	    	socket.emit('addIncident',{'incident': incident},function(data){});  	 
-	      	res.send({ 'incident': incident });
-	    }); 		 
+
+	    //check the distance between incident reported and current position
+	    var distance=calculateDistance(req.body.currentPosition.latitude,req.body.currentPosition.longitude,incident.loc.coordinates[1],incident.loc.coordinates[0])
+	    if(distance>10){
+	    	console.log(distance);
+	    	fnErrorResponse(res,'Location is too far from you!');
+	    } 
+	    else { 
+		    incident.save(function() {	  
+		    	socket.emit('addIncident',{'incident': incident},function(data){});  	 
+		      	res.send({ 'incident': incident });
+		    }); 	
+	    }	 
  	});
 	router.post('/api/incident/:id',function   (req,res,next) {
 		Incident.findOne({_id:req.params.id},function(err, incident){
@@ -345,6 +362,25 @@
 		d.setDate(d.getDate() - byDays);
 		return d.toISOString().
   		replace(/T.+/, ' ').trim();
+	}
+	function calculateDistance(lat,lng,lat1,lng1){
+		//calculate distance
+		var R = 6371000; // metres
+		var φ1 = toRadians(lat);
+		var φ2 = toRadians(lat1);
+		var Δφ = toRadians(lat1-lat);
+		var Δλ = toRadians(lng1-lng);
+
+		var a = Math.sin(Δφ/2) * Math.sin(Δφ/2) +
+		        Math.cos(φ1) * Math.cos(φ2) *
+		        Math.sin(Δλ/2) * Math.sin(Δλ/2);
+		var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+
+		var d = R * c;
+		return d;
+	}
+	function toRadians(n){
+		return n * Math.PI / 180;
 	}
 	module.exports=router;
 }());
